@@ -35,7 +35,7 @@ export type DebugCategory =
   | 'BROKEN'
   | 'TIMER';   // 2026-05-25 round 3: plank counter freeze/resume during sustained bad form
 
-export type EngineTag = 'SQUAT' | 'PLANK' | 'PUSHUP' | 'LUNGE' | 'TANDEM' | 'CURL' | 'SLS' | 'CHAIR' | 'RAISE' | 'TREE' | 'WARRIOR' | 'WARRIOR1' | 'WARRIOR3' | 'MOUNTAIN' | 'CALF' | 'JACKS' | 'KNEES' | 'FRONT' | 'CIRCLES' | 'GODDESS' | 'TRIANGLE' | 'WALLSIT' | 'LEGRAISE' | 'SIDEBEND' | 'REVLUNGE' | 'LATERALLUNGE' | 'SIDEPLANK' | 'BOAT' | 'SIT2STAND' | 'FOLD' | 'DOG' | 'COBRA' | 'MARCH' | 'SFOLD' | 'STAR' | 'FIG4' | 'GATE' | 'COSSACK' | 'LEGSWING' | 'CATCOW';
+export type EngineTag = 'SQUAT' | 'PLANK' | 'PUSHUP' | 'LUNGE' | 'TANDEM' | 'CURL' | 'SLS' | 'CHAIR' | 'RAISE' | 'TREE' | 'WARRIOR' | 'WARRIOR1' | 'WARRIOR3' | 'MOUNTAIN' | 'CALF' | 'JACKS' | 'KNEES' | 'FRONT' | 'CIRCLES' | 'GODDESS' | 'TRIANGLE' | 'WALLSIT' | 'LEGRAISE' | 'SIDEBEND' | 'REVLUNGE' | 'LATERALLUNGE' | 'SIDEPLANK' | 'BOAT' | 'SIT2STAND' | 'FOLD' | 'DOG' | 'COBRA' | 'MARCH' | 'SFOLD' | 'STAR' | 'FIG4' | 'GATE' | 'COSSACK' | 'LEGSWING' | 'CATCOW' | 'DEADLIFT' | 'PULLUP' | 'PRESS' | 'RDL' | 'ROW';
 
 const LEVEL_RANK: Record<DebugLevel, number> = { quiet: 0, info: 1, verbose: 2 };
 

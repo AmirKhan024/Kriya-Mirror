@@ -1,0 +1,45 @@
+import type { ExerciseConfig } from './types';
+
+export const barbellRowConfig: ExerciseConfig = {
+  id: 'barbell-row',
+  catalogCode: 'S7',
+  name: 'Barbell / Dumbbell Row',
+  category: 'strength-compound',
+  equipment: ['Barbell', 'Dumbbells'],
+  primaryMuscles: ['Latissimus Dorsi', 'Rhomboids', 'Middle Trapezius'],
+  secondaryMuscles: ['Biceps', 'Rear Deltoid', 'Erector Spinae'],
+  difficulty: 'Intermediate',
+  trackFields: ['Sets', 'Reps', 'Load (kg)', 'Elbow path', 'Hip hinge angle'],
+  instructions: [
+    'Stand side-on to the camera. Hinge at the hips to about 45° — torso roughly diagonal.',
+    'Let the bar / dumbbells hang directly under your shoulders, arms perpendicular to floor.',
+    'Drive your elbows up toward the ceiling. Do NOT shrug your shoulders.',
+    'Pull until bar/dumbbells reach your lower sternum or navel.',
+    'Lower with control. Let arms fully extend before the next rep.',
+  ],
+  commonErrors: [
+    { error: 'Using momentum / torso rocking', cameraDetection: 'Hip Y oscillation > 0.04 during the row' },
+    { error: 'Pulling to wrong point (upper chest instead of lower sternum)', cameraDetection: 'Wrist height at row peak vs hip reference' },
+    { error: 'Rounded back during row', cameraDetection: 'Shoulder drops below hip during row' },
+    { error: 'Not achieving full arm extension at the bottom', cameraDetection: 'Elbow angle < 20° at rep bottom' },
+  ],
+  breathing: 'Inhale before the pull → exhale as you row up → inhale on the way down.',
+  modifications: {
+    easier: ['Single-arm dumbbell row (with bench support)', 'TRX/suspension row', 'Cable row'],
+    harder: ['Pendlay row (dead stop each rep)', 'Yates row (supinated grip)', 'One-arm barbell row'],
+  },
+  guidanceModes: { imageText: true, videoAudio: true, cameraVision: 'partial' },
+  exerciseType: 'rep-based',
+  isStrength: true,
+  defaultSets: 3,
+  defaultRepsPerSet: 8,
+  defaultRestSec: 90,
+  safetyChecks: [
+    'I have no acute lower back pain or disc injury that limits forward bending',
+    'I have no shoulder or elbow pain with pulling movements',
+    'I know how to maintain a neutral spine while in a bent-over position',
+  ],
+  engineModule: 'barbell-row',
+  images: { hero: 'svg:row-hero', steps: ['svg:row-hinge', 'svg:row-pull', 'svg:row-top'] },
+  videoUrl: '',
+};

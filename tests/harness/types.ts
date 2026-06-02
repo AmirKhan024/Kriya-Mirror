@@ -1171,3 +1171,125 @@ export interface GoddessPosePoseIntent {
   visibility?: number;
   occludedIndices?: number[];
 }
+
+// === Strength-exercise pose intents (ported from Bilal's harness) ===
+/** Pull-Up synth — front-facing hanging pose with both arms parameterized by elbow flex.
+ *  The wrists are fixed at the bar (top of frame). As flex increases, shoulders rise. */
+export interface PullUpPoseIntent {
+  /** Elbow flexion in degrees. 0 = dead hang (arms fully extended), 130 = full pull-up. */
+  elbowFlexionDeg: number;
+  /** Per-arm override. */
+  leftElbowFlexionDeg?: number;
+  rightElbowFlexionDeg?: number;
+  /** Shoulder shrug amount (reduces ear-shoulder gap). 0 = no shrug, 0.08 = clear shrug.
+   *  Values > ~0.025 will drop gap below SHRUG_GAP_RATIO * baseline (0.075). */
+  shrugAmount?: number;
+  /** Hip X displacement from center — simulates kipping swing.
+   *  0 = no swing, 0.08 = clear kipping (> HIP_SWING_THRESHOLD 0.06). */
+  hipSwingX?: number;
+  /** Vertical offset applied to the bar/wrist positions. Default 0.
+   *  Use positive values (> ~0.27) to make wrists drop below shoulder level,
+   *  which fails the wristsAboveShoulder calibration gate. */
+  wristYOffset?: number;
+  /** Scale factor for the hanging leg length below hips (default 1.0 → bodyHeight ≈ 0.50).
+   *  Set < 0.66 for too-far (bodyHeight < 0.40), > 1.67 for too-close (bodyHeight > 0.90). */
+  bodyHeightScale?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+/** Conventional Deadlift synth — side-facing pose. Left side to camera by default. */
+export interface DeadliftPoseIntent {
+  /** Hip hinge angle in degrees. 0 = standing upright, 80 = deep hinge. */
+  hipHingeDeg: number;
+  /** True = wrists below shoulder level (arms at sides / holding bar). Default true. */
+  armsAtSides?: boolean;
+  /** Forces shoulder.y > hip.y + 0.06 to trigger rounded-back warning. Default false. */
+  roundedBack?: boolean;
+  /** Override hip y-position by this amount (negative = hip rises = smaller y).
+   *  Use to simulate hip movement for hips-shooting-up tests. Default 0. */
+  hipYOffset?: number;
+  /** Side facing camera. Default 'left'. */
+  side?: 'left' | 'right';
+  /** Body height as fraction of frame height (|ankle.y - shoulder.y|). Default 0.62. */
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+/** Overhead Press synth — front-facing standing pose with both arms overhead.
+ *  elbowFlexionDeg here is the interior bend angle returned by elbowFlexionDeg():
+ *    ~70–90° = racked (bar at shoulder/chest, arms bent)
+ *    ~10–15° = locked out (arms fully extended overhead) */
+export interface OverheadPressPoseIntent {
+  /** Elbow flexion (interior bend angle) applied to BOTH arms.
+   *  70 = racked (bar at shoulder), 10 = arms fully extended overhead. */
+  elbowFlexionDeg: number;
+  /** Per-arm override. */
+  leftElbowFlexionDeg?: number;
+  rightElbowFlexionDeg?: number;
+  /** Ankle width / shoulder width. Default 1.0. */
+  feetWidthRatio?: number;
+  /** Hip forward offset from shoulder midpoint — simulates lower-back arch.
+   *  Default 0. > 0.06 triggers lower-back-arch warning. */
+  backArchOffset?: number;
+  /** Wrist X drift from calibration baseline. Default 0. > 0.04 triggers bar-path-drift. */
+  barPathDrift?: number;
+  /** Body span as fraction of frame height. Default 0.70. */
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+/** Romanian Deadlift synth — side-facing pose. Left side to camera by default.
+ *  Knees maintain a constant soft bend (unlike conventional DL where knees flex more at bottom).
+ */
+export interface RomanianDeadliftPoseIntent {
+  /** Hip hinge angle in degrees. 0 = standing upright, 70 = full RDL stretch. */
+  hipHingeDeg: number;
+  /** Knee flexion angle (hip-knee-ankle). Default 15° (soft bend, stays constant throughout RDL). */
+  kneeAngleDeg?: number;
+  /** Forces shoulder.y > hip.y + 0.06 to trigger rdl-back-rounded warning. Default false. */
+  roundedBack?: boolean;
+  /** Additional knee bend above baseline (simulates excessive knee bend / squat pattern). Default 0. */
+  extraKneeBend?: number;
+  /** Side facing camera. Default 'left'. */
+  side?: 'left' | 'right';
+  /** Body height as fraction of frame height. Default 0.62. */
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+/** Barbell / Dumbbell Row synth — side-facing bent-over pose.
+ *  elbowFlexionDeg here is the shoulder-elbow-wrist angle from straight:
+ *    5–20   = arms hanging straight (HANGING state)
+ *    80–130 = elbows driven up at row top (AT_ROW_TOP state)
+ */
+export interface BarbellRowPoseIntent {
+  /** Elbow flexion of the camera-side arm in degrees.
+   *  5–20 = arms hanging. 80–130 = row top. */
+  elbowFlexionDeg: number;
+  /** Hip hinge angle in degrees. Default 45. 35–65 = valid working position. */
+  hipHingeDeg?: number;
+  /** Forces shoulder.y > hip.y + 0.06 to trigger rounded-back warning. Default false. */
+  roundedBack?: boolean;
+  /** Hip Y offset to simulate momentum rocking (positive = hip rises relative to ankle). Default 0. */
+  hipSwayY?: number;
+  /** Side facing camera. Default 'left'. */
+  side?: 'left' | 'right';
+  /** Body height as fraction of frame height. Default 0.60. */
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}

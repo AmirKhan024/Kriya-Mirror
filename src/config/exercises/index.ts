@@ -39,6 +39,12 @@ import { gatePoseConfig } from './gate-pose.config';
 import { cossackSquatConfig } from './cossack-squat.config';
 import { standingLegSwingConfig } from './standing-leg-swing.config';
 import { catCowConfig } from './cat-cow.config';
+// Strength exercises (integrated from Bilal's repo)
+import { conventionalDeadliftConfig } from './conventional-deadlift.config';
+import { pullUpConfig } from './pull-up.config';
+import { overheadPressConfig } from './overhead-press.config';
+import { barbellRowConfig } from './barbell-row.config';
+import { romanianDeadliftConfig } from './romanian-deadlift.config';
 
 export {
   squatConfig, plankConfig, pushupConfig, lungeConfig,
@@ -52,6 +58,8 @@ export {
   sitToStandConfig, standingForwardFoldConfig, downwardDogConfig, cobraPoseConfig,
   seatedMarchConfig, seatedForwardFoldConfig, starPoseConfig, standingFigure4Config, gatePoseConfig,
   cossackSquatConfig, standingLegSwingConfig, catCowConfig,
+  conventionalDeadliftConfig, pullUpConfig, overheadPressConfig,
+  barbellRowConfig, romanianDeadliftConfig,
 };
 
 export const ALL_EXERCISES: ExerciseConfig[] = [
@@ -66,6 +74,8 @@ export const ALL_EXERCISES: ExerciseConfig[] = [
   sitToStandConfig, standingForwardFoldConfig, downwardDogConfig, cobraPoseConfig,
   seatedMarchConfig, seatedForwardFoldConfig, starPoseConfig, standingFigure4Config, gatePoseConfig,
   cossackSquatConfig, standingLegSwingConfig, catCowConfig,
+  conventionalDeadliftConfig, pullUpConfig, overheadPressConfig,
+  barbellRowConfig, romanianDeadliftConfig,
 ];
 
 // getExerciseById intentionally does NOT filter on isVisible — a soft-deprecated

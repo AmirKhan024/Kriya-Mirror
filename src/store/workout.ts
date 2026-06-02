@@ -106,7 +106,26 @@ export type WarningType =
   // Cat-Cow: a cycle didn't move through a full range — arch and round the spine more
   | 'shallow-spine-rom'
   // Downward Dog: arms bending (should stay straight — recoverable, freezes timer)
-  | 'arms-not-straight';
+  | 'arms-not-straight'
+  // ── Strength exercises (integrated from Bilal's repo) ──
+  // Conventional Deadlift: spine rounding under load / hips rising faster than chest / short ROM
+  | 'rounded-back'
+  | 'hips-shooting-up'
+  | 'incomplete-deadlift'
+  // Pull-Up: shoulders shrugging instead of pulling / short ROM
+  | 'shoulder-shrug'
+  | 'incomplete-pullup'
+  // Overhead Press: lower-back arch / bar drifting off vertical / short lockout
+  | 'lower-back-arch'
+  | 'bar-path-drift'
+  | 'incomplete-press'
+  // Barbell Row: using momentum / short ROM
+  | 'row-momentum'
+  | 'incomplete-row'
+  // Romanian Deadlift: spine rounding / knees over-bending into a squat / short ROM
+  | 'rdl-back-rounded'
+  | 'excessive-knee-bend'
+  | 'incomplete-rdl';
 
 export interface RepRecord {
   index: number;
@@ -260,6 +279,19 @@ function emptyWarningCounts(): Record<WarningType, number> {
     'chest-not-lifted': 0,
     'shallow-spine-rom': 0,
     'arms-not-straight': 0,
+    'rounded-back': 0,
+    'hips-shooting-up': 0,
+    'incomplete-deadlift': 0,
+    'shoulder-shrug': 0,
+    'incomplete-pullup': 0,
+    'lower-back-arch': 0,
+    'bar-path-drift': 0,
+    'incomplete-press': 0,
+    'row-momentum': 0,
+    'incomplete-row': 0,
+    'rdl-back-rounded': 0,
+    'excessive-knee-bend': 0,
+    'incomplete-rdl': 0,
   };
 }
 

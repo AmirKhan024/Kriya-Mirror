@@ -102,6 +102,20 @@ const STRINGS: Record<WarningType, { text: string; tone: 'amber' | 'danger' }> =
   'shallow-spine-rom': { text: 'Arch and round your back through a fuller range', tone: 'amber' },
   // Downward Dog: arms bending (recoverable — straighten them)
   'arms-not-straight': { text: 'Straighten your arms — press the floor away', tone: 'amber' },
+  // Strength exercises (integrated from Bilal's repo)
+  'rounded-back': { text: 'Keep your back straight — don\'t round', tone: 'danger' },
+  'hips-shooting-up': { text: 'Hips and shoulders rise together', tone: 'danger' },
+  'incomplete-deadlift': { text: 'Hinge deeper — push your hips back further', tone: 'amber' },
+  'shoulder-shrug': { text: 'Drop your shoulders — pull with your lats', tone: 'amber' },
+  'incomplete-pullup': { text: 'Pull higher — chin over the bar', tone: 'amber' },
+  'lower-back-arch': { text: 'Brace your core — don\'t arch your lower back', tone: 'danger' },
+  'bar-path-drift': { text: 'Press straight up — keep the bar on a vertical path', tone: 'amber' },
+  'incomplete-press': { text: 'Lock out fully — extend your elbows at the top', tone: 'amber' },
+  'row-momentum': { text: 'Slow down — control the pull, no momentum', tone: 'amber' },
+  'incomplete-row': { text: 'Pull higher — bring the bar to your torso', tone: 'amber' },
+  'rdl-back-rounded': { text: 'Keep your back straight — don\'t round it', tone: 'danger' },
+  'excessive-knee-bend': { text: 'Keep knees soft but fixed — don\'t squat down', tone: 'amber' },
+  'incomplete-rdl': { text: 'Hinge deeper — push your hips back further', tone: 'amber' },
 };
 
 const URGENT_OVERRIDE: Record<WarningType, string> = {
@@ -167,6 +181,20 @@ const URGENT_OVERRIDE: Record<WarningType, string> = {
   'chest-not-lifted': 'Lift your chest higher — press through your hands',
   'shallow-spine-rom': 'Move bigger — really arch and round your back each rep',
   'arms-not-straight': 'Stop — arms bending. Straighten them and press the floor away',
+  // Strength exercises (integrated from Bilal's repo)
+  'rounded-back': 'Stop — back rounding every rep. Reset and brace your core',
+  'hips-shooting-up': 'Stop — hips shooting up. Drive through your legs equally',
+  'incomplete-deadlift': 'Stop — reps too shallow. Hinge deeper each time',
+  'shoulder-shrug': 'Stop — shoulders shrugging every rep. Depress your scapulae',
+  'incomplete-pullup': 'Stop — chin not clearing the bar. Pull all the way up',
+  'lower-back-arch': 'Stop — back arching every rep. Brace harder and reset',
+  'bar-path-drift': 'Stop — bar drifting off vertical. Control the path',
+  'incomplete-press': 'Stop — not locking out. Extend your elbows fully at the top',
+  'row-momentum': 'Stop — using momentum. Slow it down',
+  'incomplete-row': 'Stop — rows too shallow. Pull all the way to your torso',
+  'rdl-back-rounded': 'Stop — back rounding every rep. Brace your core and reset',
+  'excessive-knee-bend': 'Stop — knees bending too much. Keep them soft and still',
+  'incomplete-rdl': 'Stop — hinge not deep enough. Push hips further back',
 };
 
 interface Props {

@@ -67,6 +67,19 @@ const WARNING_LABEL: Record<WarningType, string> = {
   'chest-not-lifted': 'Chest dropped (not lifted)',
   'shallow-spine-rom': 'Shallow spine range',
   'arms-not-straight': 'Arms bending (should stay straight)',
+  'rounded-back': 'Rounded lower back',
+  'hips-shooting-up': 'Hips shooting up first',
+  'incomplete-deadlift': 'Shallow deadlift',
+  'shoulder-shrug': 'Shoulder shrug (traps)',
+  'incomplete-pullup': 'Chin did not clear bar',
+  'lower-back-arch': 'Lower back hyperextension',
+  'bar-path-drift': 'Bar path drift',
+  'incomplete-press': 'Incomplete lockout',
+  'row-momentum': 'Momentum / body swing',
+  'incomplete-row': 'Incomplete row (low elbow drive)',
+  'rdl-back-rounded': 'Back rounded during hinge',
+  'excessive-knee-bend': 'Excessive knee bend (squat pattern)',
+  'incomplete-rdl': 'Shallow RDL hinge',
 };
 
 export default function ReportPage({ params: _params }: { params: { exerciseId: string } }) {
@@ -539,5 +552,18 @@ function newWarningTotals(): Record<WarningType, number> {
     'chest-not-lifted': 0,
     'shallow-spine-rom': 0,
     'arms-not-straight': 0,
+    'rounded-back': 0,
+    'hips-shooting-up': 0,
+    'incomplete-deadlift': 0,
+    'shoulder-shrug': 0,
+    'incomplete-pullup': 0,
+    'lower-back-arch': 0,
+    'bar-path-drift': 0,
+    'incomplete-press': 0,
+    'row-momentum': 0,
+    'incomplete-row': 0,
+    'rdl-back-rounded': 0,
+    'excessive-knee-bend': 0,
+    'incomplete-rdl': 0,
   };
 }

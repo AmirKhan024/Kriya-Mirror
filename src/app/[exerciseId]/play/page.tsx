@@ -45,6 +45,12 @@ import { DownwardDogEngine } from '@/modules/downward-dog/engine';
 import { CobraPoseEngine } from '@/modules/cobra-pose/engine';
 import { SeatedMarchEngine } from '@/modules/seated-march/engine';
 import { SeatedForwardFoldEngine } from '@/modules/seated-forward-fold/engine';
+// Strength exercises (integrated from Bilal's repo)
+import { ConventionalDeadliftEngine } from '@/modules/conventional-deadlift/engine';
+import { PullUpEngine } from '@/modules/pull-up/engine';
+import { OverheadPressEngine } from '@/modules/overhead-press/engine';
+import { BarbellRowEngine } from '@/modules/barbell-row/engine';
+import { RomanianDeadliftEngine } from '@/modules/romanian-deadlift/engine';
 import type { CalibrationUpdate, FrameMetrics } from '@/modules/squat/types';
 import type { PoseLandmarks } from '@/modules/pose/types';
 import type { ExerciseEngine } from '@/modules/engine-interface';
@@ -179,6 +185,20 @@ const WARNING_PRIORITY: Record<WarningType, number> = {
   'shallow-spine-rom': 3,
   // Downward Dog — arms bending (recoverable, freezes the timer) at the form tier.
   'arms-not-straight': 4,
+  // Strength exercises (integrated from Bilal's repo)
+  'rounded-back': 4,
+  'hips-shooting-up': 4,
+  'incomplete-deadlift': 3,
+  'shoulder-shrug': 4,
+  'incomplete-pullup': 3,
+  'lower-back-arch': 4,
+  'bar-path-drift': 3,
+  'incomplete-press': 3,
+  'row-momentum': 4,
+  'incomplete-row': 3,
+  'rdl-back-rounded': 4,
+  'excessive-knee-bend': 3,
+  'incomplete-rdl': 3,
 };
 
 // 2026-05-25 Issue 2: voice coaching during calibration based on most-blocking
@@ -263,6 +283,20 @@ const WARNING_SPEECH: Record<WarningType, string> = {
   'chest-not-lifted': 'Lift your chest higher.',
   'shallow-spine-rom': 'Move through a bigger range — arch and round your back more.',
   'arms-not-straight': 'Straighten your arms. Press the floor away.',
+  // Strength exercises (integrated from Bilal's repo)
+  'rounded-back': 'Keep your back straight. Do not round your spine.',
+  'hips-shooting-up': 'Drive through your legs. Hips and shoulders rise together.',
+  'incomplete-deadlift': 'Hinge deeper. Push your hips back further.',
+  'shoulder-shrug': 'Drop your shoulders. Pull with your lats, not your traps.',
+  'incomplete-pullup': 'Pull higher. Chin over the bar.',
+  'lower-back-arch': 'Keep your core braced. Do not let your lower back arch.',
+  'bar-path-drift': 'Press straight up — keep the bar on a vertical path.',
+  'incomplete-press': 'Fully lock out your elbows at the top of each rep.',
+  'row-momentum': 'Control the movement — do not rock your body to pull the weight.',
+  'incomplete-row': 'Drive your elbows higher to get full back contraction.',
+  'rdl-back-rounded': 'Keep your back flat. Hinge from the hips, not the spine.',
+  'excessive-knee-bend': 'Keep your knees soft but fixed. Do not squat down.',
+  'incomplete-rdl': 'Hinge deeper. Push your hips back further.',
 };
 
 export default function PlayPage({ params }: { params: { exerciseId: string } }) {
@@ -787,6 +821,36 @@ export default function PlayPage({ params }: { params: { exerciseId: string } })
           });
         } else if (exercise.engineModule === 'arm-circles') {
           engineRef.current = new ArmCirclesEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'conventional-deadlift') {
+          engineRef.current = new ConventionalDeadliftEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'pull-up') {
+          engineRef.current = new PullUpEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'overhead-press') {
+          engineRef.current = new OverheadPressEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'romanian-deadlift') {
+          engineRef.current = new RomanianDeadliftEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'barbell-row') {
+          engineRef.current = new BarbellRowEngine({
             ...sharedCallbacks,
             onRepComplete: (r) => mounted && handleRepComplete(r),
             onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),

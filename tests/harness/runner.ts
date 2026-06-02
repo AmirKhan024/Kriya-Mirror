@@ -43,6 +43,17 @@ import { DownwardDogEngine } from '@/modules/downward-dog/engine';
 import { CobraPoseEngine } from '@/modules/cobra-pose/engine';
 import { SeatedMarchEngine } from '@/modules/seated-march/engine';
 import { SeatedForwardFoldEngine } from '@/modules/seated-forward-fold/engine';
+// Strength exercises (ported from Bilal's harness)
+import { ConventionalDeadliftEngine } from '@/modules/conventional-deadlift/engine';
+import { PullUpEngine } from '@/modules/pull-up/engine';
+import { OverheadPressEngine } from '@/modules/overhead-press/engine';
+import { BarbellRowEngine } from '@/modules/barbell-row/engine';
+import { RomanianDeadliftEngine } from '@/modules/romanian-deadlift/engine';
+import type { DeadliftFrameMetrics, DeadliftRepEvent } from '@/modules/conventional-deadlift/types';
+import type { PullUpFrameMetrics } from '@/modules/pull-up/types';
+import type { OHPFrameMetrics } from '@/modules/overhead-press/types';
+import type { RowFrameMetrics, RowRepEvent } from '@/modules/barbell-row/types';
+import type { RDLFrameMetrics, RDLRepEvent } from '@/modules/romanian-deadlift/types';
 import type { CalibrationUpdate, FrameMetrics } from '@/modules/squat/types';
 import type { PlankFrameMetrics } from '@/modules/plank/types';
 import type { PushupFrameMetrics } from '@/modules/pushup/types';
@@ -2286,4 +2297,277 @@ export function warningsOtherThan(
   ...allowed: WarningType[]
 ): WarningRecord[] {
   return result.warnings.filter((w) => !allowed.includes(w.type));
+}
+
+// ====================================================================
+// Strength-exercise session runners (ported from Bilal's harness)
+// ====================================================================
+export interface DeadliftRepRecord extends DeadliftRepEvent {
+  index: number;
+  atMs: number;
+}
+
+export interface DeadliftRunResult {
+  completedReps: DeadliftRepRecord[];
+  warnings: WarningRecord[];
+  finalCalibration: CalibrationUpdate | null;
+  calibrationConfirmedAtMs: number | null;
+  frameMetricsSamples: DeadliftFrameMetrics[];
+}
+
+export function runDeadliftSession(frames: Frame[]): DeadliftRunResult {
+  const completedReps: DeadliftRepRecord[] = [];
+  const warnings: WarningRecord[] = [];
+  const frameMetricsSamples: DeadliftFrameMetrics[] = [];
+  let finalCalibration: CalibrationUpdate | null = null;
+  let calibrationConfirmedAtMs: number | null = null;
+  let currentTMs = 0;
+
+  const engine = new ConventionalDeadliftEngine({
+    onCalibrationUpdate: (u) => {
+      finalCalibration = u;
+      if (u.state === 'confirmed' && calibrationConfirmedAtMs === null) {
+        calibrationConfirmedAtMs = currentTMs;
+      }
+    },
+    onRepComplete: (r) => {
+      completedReps.push({
+        index: completedReps.length + 1,
+        ...r,
+        atMs: currentTMs,
+      });
+    },
+    onPostureWarning: (type) => {
+      warnings.push({ type, atMs: currentTMs });
+    },
+    onFrame: (m) => frameMetricsSamples.push(m),
+  });
+
+  for (const frame of frames) {
+    currentTMs = frame.tMs;
+    engine.update(frame.landmarks, frame.tMs);
+  }
+  engine.finish();
+
+  return {
+    completedReps,
+    warnings,
+    finalCalibration,
+    calibrationConfirmedAtMs,
+    frameMetricsSamples,
+  };
+}
+
+export interface PullUpRunResult {
+  completedReps: RepRecord[];
+  warnings: WarningRecord[];
+  finalCalibration: CalibrationUpdate | null;
+  calibrationConfirmedAtMs: number | null;
+  frameMetricsSamples: PullUpFrameMetrics[];
+}
+
+export function runPullUpSession(frames: Frame[]): PullUpRunResult {
+  const completedReps: RepRecord[] = [];
+  const warnings: WarningRecord[] = [];
+  const frameMetricsSamples: PullUpFrameMetrics[] = [];
+  let finalCalibration: CalibrationUpdate | null = null;
+  let calibrationConfirmedAtMs: number | null = null;
+  let currentTMs = 0;
+
+  const engine = new PullUpEngine({
+    onCalibrationUpdate: (u) => {
+      finalCalibration = u;
+      if (u.state === 'confirmed' && calibrationConfirmedAtMs === null) {
+        calibrationConfirmedAtMs = currentTMs;
+      }
+    },
+    onRepComplete: (r) => {
+      completedReps.push({
+        index: completedReps.length + 1,
+        ...r,
+        atMs: currentTMs,
+      });
+    },
+    onPostureWarning: (type) => {
+      warnings.push({ type, atMs: currentTMs });
+    },
+    onFrame: (m) => frameMetricsSamples.push(m),
+  });
+
+  for (const frame of frames) {
+    currentTMs = frame.tMs;
+    engine.update(frame.landmarks, frame.tMs);
+  }
+  engine.finish();
+
+  return {
+    completedReps,
+    warnings,
+    finalCalibration,
+    calibrationConfirmedAtMs,
+    frameMetricsSamples,
+  };
+}
+
+export interface OHPRunResult {
+  completedReps: RepRecord[];
+  warnings: WarningRecord[];
+  finalCalibration: CalibrationUpdate | null;
+  calibrationConfirmedAtMs: number | null;
+  frameMetricsSamples: OHPFrameMetrics[];
+}
+
+export function runOverheadPressSession(frames: Frame[]): OHPRunResult {
+  const completedReps: RepRecord[] = [];
+  const warnings: WarningRecord[] = [];
+  const frameMetricsSamples: OHPFrameMetrics[] = [];
+  let finalCalibration: CalibrationUpdate | null = null;
+  let calibrationConfirmedAtMs: number | null = null;
+  let currentTMs = 0;
+
+  const engine = new OverheadPressEngine({
+    onCalibrationUpdate: (u) => {
+      finalCalibration = u;
+      if (u.state === 'confirmed' && calibrationConfirmedAtMs === null) {
+        calibrationConfirmedAtMs = currentTMs;
+      }
+    },
+    onRepComplete: (r) => {
+      completedReps.push({
+        index: completedReps.length + 1,
+        ...r,
+        atMs: currentTMs,
+      });
+    },
+    onPostureWarning: (type) => {
+      warnings.push({ type, atMs: currentTMs });
+    },
+    onFrame: (m) => frameMetricsSamples.push(m),
+  });
+
+  for (const frame of frames) {
+    currentTMs = frame.tMs;
+    engine.update(frame.landmarks, frame.tMs);
+  }
+  engine.finish();
+
+  return {
+    completedReps,
+    warnings,
+    finalCalibration,
+    calibrationConfirmedAtMs,
+    frameMetricsSamples,
+  };
+}
+
+export interface RowRepRecord extends RowRepEvent {
+  index: number;
+  atMs: number;
+}
+
+export interface RowRunResult {
+  completedReps: RowRepRecord[];
+  warnings: WarningRecord[];
+  finalCalibration: CalibrationUpdate | null;
+  calibrationConfirmedAtMs: number | null;
+  frameMetricsSamples: RowFrameMetrics[];
+}
+
+export function runRowSession(frames: Frame[]): RowRunResult {
+  const completedReps: RowRepRecord[] = [];
+  const warnings: WarningRecord[] = [];
+  const frameMetricsSamples: RowFrameMetrics[] = [];
+  let finalCalibration: CalibrationUpdate | null = null;
+  let calibrationConfirmedAtMs: number | null = null;
+  let currentTMs = 0;
+
+  const engine = new BarbellRowEngine({
+    onCalibrationUpdate: (u) => {
+      finalCalibration = u;
+      if (u.state === 'confirmed' && calibrationConfirmedAtMs === null) {
+        calibrationConfirmedAtMs = currentTMs;
+      }
+    },
+    onRepComplete: (r) => {
+      completedReps.push({
+        index: completedReps.length + 1,
+        ...r,
+        atMs: currentTMs,
+      });
+    },
+    onPostureWarning: (type) => {
+      warnings.push({ type, atMs: currentTMs });
+    },
+    onFrame: (m) => frameMetricsSamples.push(m),
+  });
+
+  for (const frame of frames) {
+    currentTMs = frame.tMs;
+    engine.update(frame.landmarks, frame.tMs);
+  }
+  engine.finish();
+
+  return {
+    completedReps,
+    warnings,
+    finalCalibration,
+    calibrationConfirmedAtMs,
+    frameMetricsSamples,
+  };
+}
+
+export interface RDLRepRecord extends RDLRepEvent {
+  index: number;
+  atMs: number;
+}
+
+export interface RDLRunResult {
+  completedReps: RDLRepRecord[];
+  warnings: WarningRecord[];
+  finalCalibration: CalibrationUpdate | null;
+  calibrationConfirmedAtMs: number | null;
+  frameMetricsSamples: RDLFrameMetrics[];
+}
+
+export function runRDLSession(frames: Frame[]): RDLRunResult {
+  const completedReps: RDLRepRecord[] = [];
+  const warnings: WarningRecord[] = [];
+  const frameMetricsSamples: RDLFrameMetrics[] = [];
+  let finalCalibration: CalibrationUpdate | null = null;
+  let calibrationConfirmedAtMs: number | null = null;
+  let currentTMs = 0;
+
+  const engine = new RomanianDeadliftEngine({
+    onCalibrationUpdate: (u) => {
+      finalCalibration = u;
+      if (u.state === 'confirmed' && calibrationConfirmedAtMs === null) {
+        calibrationConfirmedAtMs = currentTMs;
+      }
+    },
+    onRepComplete: (r) => {
+      completedReps.push({
+        index: completedReps.length + 1,
+        ...r,
+        atMs: currentTMs,
+      });
+    },
+    onPostureWarning: (type) => {
+      warnings.push({ type, atMs: currentTMs });
+    },
+    onFrame: (m) => frameMetricsSamples.push(m),
+  });
+
+  for (const frame of frames) {
+    currentTMs = frame.tMs;
+    engine.update(frame.landmarks, frame.tMs);
+  }
+  engine.finish();
+
+  return {
+    completedReps,
+    warnings,
+    finalCalibration,
+    calibrationConfirmedAtMs,
+    frameMetricsSamples,
+  };
 }

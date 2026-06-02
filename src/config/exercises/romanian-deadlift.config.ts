@@ -1,0 +1,45 @@
+import type { ExerciseConfig } from './types';
+
+export const romanianDeadliftConfig: ExerciseConfig = {
+  id: 'romanian-deadlift',
+  catalogCode: 'S6',
+  name: 'Romanian Deadlift (RDL)',
+  category: 'strength-compound',
+  equipment: ['Barbell', 'Dumbbells', 'Resistance Band'],
+  primaryMuscles: ['Hamstrings', 'Glutes'],
+  secondaryMuscles: ['Erector Spinae', 'Core'],
+  difficulty: 'Intermediate',
+  trackFields: ['Sets', 'Reps', 'Load (kg)', 'Hip hinge depth', 'Hamstring stretch depth'],
+  instructions: [
+    'Stand side-on to the camera. Hold weights in front at thigh level. Soft bend in knees throughout.',
+    'Hinge at your hips: push hips back, chest stays tall. Back must remain neutral.',
+    'Lower until you feel a strong hamstring stretch (usually bar at shin level).',
+    'Drive hips forward to stand. Squeeze glutes at the top.',
+    'Do NOT let your lower back round or your knees bend further as you hinge.',
+  ],
+  commonErrors: [
+    { error: 'Rounded lower back', cameraDetection: 'Shoulder drops below hip level during hinge' },
+    { error: 'Bending knees too much (turning into a squat)', cameraDetection: 'Knee angle increases > 20° from calibration baseline' },
+    { error: 'Not achieving full hamstring stretch', cameraDetection: 'Peak hip hinge < 40°' },
+    { error: 'Hyperextending at the top', cameraDetection: 'Hip-to-shoulder angle past neutral at lockout' },
+  ],
+  breathing: 'Big breath + brace before hinging → hold through the stretch → exhale at the top.',
+  modifications: {
+    easier: ['Bodyweight RDL (no load)', 'Single-leg RDL (bodyweight)', 'Hip hinge drill with dowel rod'],
+    harder: ['Single-leg RDL with weight', 'Deficit RDL', 'Pause RDL (3s stretch)'],
+  },
+  guidanceModes: { imageText: true, videoAudio: true, cameraVision: 'full' },
+  exerciseType: 'rep-based',
+  isStrength: true,
+  defaultSets: 3,
+  defaultRepsPerSet: 8,
+  defaultRestSec: 90,
+  safetyChecks: [
+    'I have no acute lower back pain or recent hamstring strain',
+    'I know how to brace my core and maintain a neutral spine during a hip hinge',
+    'I have warmed up my hamstrings before beginning',
+  ],
+  engineModule: 'romanian-deadlift',
+  images: { hero: 'svg:rdl-hero', steps: ['svg:rdl-stand', 'svg:rdl-hinge', 'svg:rdl-stretch'] },
+  videoUrl: '',
+};
