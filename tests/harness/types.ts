@@ -1293,3 +1293,328 @@ export interface BarbellRowPoseIntent {
   visibility?: number;
   occludedIndices?: number[];
 }
+
+// ── New exercises (Bilal's round 2) ──────────────────────────────────────────
+
+export interface HammerCurlPoseIntent {
+  elbowFlexionDeg: number;
+  leftElbowFlexionDeg?: number;
+  rightElbowFlexionDeg?: number;
+  feetWidthRatio?: number;
+  torsoSwayX?: number;
+  elbowDriftX?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface KBSwingPoseIntent {
+  hipHingeDeg: number;
+  extraKneeBend?: number;
+  armLift?: boolean;
+  roundedBack?: boolean;
+  side?: 'left' | 'right';
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface MountainClimberPoseIntent {
+  kneeHipAngleDeg: number;
+  hipDeviation?: number;
+  side?: 'left' | 'right';
+  bodyLength?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface BurpeePoseIntent {
+  hipYOffset: number;
+  kneeAngleDeg?: number;
+  hipPlankDeviation?: number;
+  side?: 'left' | 'right';
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface BoxJumpPoseIntent {
+  hipYOffset: number;
+  kneeAngleDeg?: number;
+  side?: 'left' | 'right';
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface StarJumpPoseIntent {
+  armRaiseDeg: number;
+  leftArmRaiseDeg?: number;
+  rightArmRaiseDeg?: number;
+  feetSpreadRatio?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface GluteBridgePoseIntent {
+  hipRise: number;
+  kneeBentOverride?: boolean;
+  hipsUpAtRest?: boolean;
+  bodySpan?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface OTEPoseIntent {
+  extensionLevel: number;
+  leftExtensionLevel?: number;
+  rightExtensionLevel?: number;
+  elbowFlareX?: number;
+  torsoSwayX?: number;
+  feetWidthRatio?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface BroadJumpPoseIntent {
+  hipYOffset: number;
+  kneeFlexionDeg?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface JumpSquatPoseIntent {
+  hipYOffset: number;
+  kneeFlexionDeg?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface ChairDipPoseIntent {
+  elbowFlexionDeg: number;
+  leftElbowFlexionDeg?: number;
+  rightElbowFlexionDeg?: number;
+  feetWidthRatio?: number;
+  torsoSwayX?: number;
+  elbowFlareX?: number;
+  bodyHeight?: number;
+  shoulderDescentY?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface DeadBugPoseIntent {
+  legExtensionDeg: number;
+  activeLeg?: 'left' | 'right';
+  hipLiftAmount?: number;
+  armsUp?: boolean;
+  bodyLengthX?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface SupermanPoseIntent {
+  shoulderRise: number;
+  hipLiftOff?: number;
+  armsForward?: boolean;
+  bodyLengthX?: number;
+  visibility?: number;
+  noise?: number;
+  seed?: number;
+  occludedIndices?: number[];
+}
+
+export interface InchwormPoseIntent {
+  hipHingeDeg: number;
+  armsAtSides?: boolean;
+  side?: 'left' | 'right';
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface ShrugPoseIntent {
+  shoulderElevation: number;
+  torsoSwing?: number;
+  feetWidthRatio?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface BirdDogPoseIntent {
+  legExtension: number;
+  activeLeg?: 'left' | 'right';
+  bodySpan?: number;
+  handsOverride?: boolean;
+  bodyNotHorizontal?: boolean;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface StepUpPoseIntent {
+  hipRise: number;
+  feetWidthRatio?: number;
+  trunkLeanDeg?: number;
+  valgusRatio?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export type WalkingLungePoseIntent = LungePoseIntent;
+
+export interface ReverseFlyPoseIntent {
+  armLiftDeg: number;
+  leftArmLiftDeg?: number;
+  rightArmLiftDeg?: number;
+  bentOver?: boolean;
+  armsHanging?: boolean;
+  distanceOk?: boolean;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface DonkeyKickPoseIntent {
+  thighLiftDeg: number;
+  bentOver?: boolean;
+  handsDown?: boolean;
+  distanceOk?: boolean;
+  bodySpan?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface FireHydrantPoseIntent {
+  thighLiftDeg: number;
+  bentOver?: boolean;
+  handsDown?: boolean;
+  distanceOk?: boolean;
+  bodySpan?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface GobletSquatPoseIntent {
+  kneeFlexionDeg: number;
+  elbowSpreadRatio?: number;
+  feetWidthRatio?: number;
+  heelLift?: number;
+  valgusRatio?: number;
+  trunkLeanDeg?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface CurtsyLungePoseIntent {
+  kneeFlexionDeg: number;
+  crossoverRatio?: number;
+  trunkLeanDeg?: number;
+  hipRotationRatio?: number;
+  hipRotation?: number;
+  kneeValgusRatio?: number;
+  bodyHeight?: number;
+  armsRaised?: boolean;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+  isNull?: boolean;
+}
+
+export interface PallofPressPoseIntent {
+  elbowExtensionDeg: number;
+  torsoRotationDeg?: number;
+  shoulderShrug?: number;
+  visibility?: number;
+  isNull?: boolean;
+}
+
+export interface LateralBandWalkPoseIntent {
+  hipXDisplacement: number;
+  stepDirection?: 'left' | 'right' | null;
+  trunkLeanDeg?: number;
+  hipDropRatio?: number;
+  isNearEdge?: boolean;
+  hipVelocity?: number;
+  bodyHeight?: number;
+  visibility?: number;
+  isNull?: boolean;
+  walkingAnkleRaise?: number;
+}
+
+export interface PistolSquatPoseIntent {
+  kneeFlexionDeg: number;
+  standingLeg?: 'left' | 'right';
+  floatingLegFlexDeg?: number;
+  armsForward?: boolean;
+  trunkLeanDeg?: number;
+  valgusRatio?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface NordicCurlPoseIntent {
+  trunkLeanDeg: number;
+  kneeling?: boolean;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}
+
+export interface ClamshellPoseIntent {
+  abductionFrac: number;
+  sideDown?: 'left' | 'right';
+  kneeBendDeg?: number;
+  bodyHeight?: number;
+  noise?: number;
+  seed?: number;
+  visibility?: number;
+  occludedIndices?: number[];
+}

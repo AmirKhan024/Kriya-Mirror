@@ -45,6 +45,35 @@ import { pullUpConfig } from './pull-up.config';
 import { overheadPressConfig } from './overhead-press.config';
 import { barbellRowConfig } from './barbell-row.config';
 import { romanianDeadliftConfig } from './romanian-deadlift.config';
+// New exercises (Bilal's round 2)
+import { hammerCurlConfig } from './hammer-curl.config';
+import { kettlebellSwingConfig } from './kettlebell-swing.config';
+import { mountainClimberConfig } from './mountain-climber.config';
+import { burpeeConfig } from './burpee.config';
+import { boxJumpConfig } from './box-jump.config';
+import { starJumpConfig } from './star-jump.config';
+import { gluteBridgeConfig } from './glute-bridge.config';
+import { overheadTricepExtensionConfig } from './overhead-tricep-extension.config';
+import { broadJumpConfig } from './broad-jump.config';
+import { chairDipConfig } from './chair-dip.config';
+import { deadBugConfig } from './dead-bug.config';
+import { inchwormConfig } from './inchworm.config';
+import { shrugConfig } from './shrug.config';
+import { supermanConfig } from './superman.config';
+import { jumpSquatConfig } from './jump-squat.config';
+import { birdDogConfig } from './bird-dog.config';
+import { stepUpConfig } from './step-up.config';
+import { walkingLungeConfig } from './walking-lunge.config';
+import { reverseFlyConfig } from './reverse-fly.config';
+import { gobletSquatConfig } from './goblet-squat.config';
+import { donkeyKickConfig } from './donkey-kick.config';
+import { fireHydrantConfig } from './fire-hydrant.config';
+import { curtsyLungeConfig } from './curtsy-lunge.config';
+import { pallofPressConfig } from './pallof-press.config';
+import { lateralBandWalkConfig } from './lateral-band-walk.config';
+import { pistolSquatConfig } from './pistol-squat.config';
+import { nordicCurlConfig } from './nordic-curl.config';
+import { clamshellConfig } from './clamshell.config';
 
 export {
   squatConfig, plankConfig, pushupConfig, lungeConfig,
@@ -60,6 +89,12 @@ export {
   cossackSquatConfig, standingLegSwingConfig, catCowConfig,
   conventionalDeadliftConfig, pullUpConfig, overheadPressConfig,
   barbellRowConfig, romanianDeadliftConfig,
+  hammerCurlConfig, kettlebellSwingConfig, mountainClimberConfig, burpeeConfig, boxJumpConfig,
+  starJumpConfig, gluteBridgeConfig, overheadTricepExtensionConfig, broadJumpConfig, chairDipConfig,
+  deadBugConfig, inchwormConfig, shrugConfig, supermanConfig, jumpSquatConfig, birdDogConfig,
+  stepUpConfig, walkingLungeConfig, reverseFlyConfig, gobletSquatConfig, donkeyKickConfig,
+  fireHydrantConfig, curtsyLungeConfig, pallofPressConfig, lateralBandWalkConfig,
+  pistolSquatConfig, nordicCurlConfig, clamshellConfig,
 };
 
 export const ALL_EXERCISES: ExerciseConfig[] = [
@@ -76,6 +111,12 @@ export const ALL_EXERCISES: ExerciseConfig[] = [
   cossackSquatConfig, standingLegSwingConfig, catCowConfig,
   conventionalDeadliftConfig, pullUpConfig, overheadPressConfig,
   barbellRowConfig, romanianDeadliftConfig,
+  hammerCurlConfig, kettlebellSwingConfig, mountainClimberConfig, burpeeConfig, boxJumpConfig,
+  starJumpConfig, gluteBridgeConfig, overheadTricepExtensionConfig, broadJumpConfig, chairDipConfig,
+  deadBugConfig, inchwormConfig, shrugConfig, supermanConfig, jumpSquatConfig, birdDogConfig,
+  stepUpConfig, walkingLungeConfig, reverseFlyConfig, gobletSquatConfig, donkeyKickConfig,
+  fireHydrantConfig, curtsyLungeConfig, pallofPressConfig, lateralBandWalkConfig,
+  pistolSquatConfig, nordicCurlConfig, clamshellConfig,
 ];
 
 // getExerciseById intentionally does NOT filter on isVisible — a soft-deprecated

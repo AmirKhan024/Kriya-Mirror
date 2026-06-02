@@ -1,0 +1,45 @@
+import type { ExerciseConfig } from './types';
+
+export const pistolSquatConfig: ExerciseConfig = {
+  id: 'pistol-squat',
+  catalogCode: 'N-PSQ',
+  name: 'Pistol Squat',
+  category: 'bodyweight',
+  equipment: [],
+  primaryMuscles: ['Quadriceps', 'Glutes'],
+  secondaryMuscles: ['Hamstrings', 'Core', 'Hip Flexors'],
+  difficulty: 'Advanced',
+  trackFields: ['Reps', 'Depth'],
+  instructions: [
+    'Stand on one leg. Extend the other leg straight in front of you.',
+    'Arms out in front for balance.',
+    'Slowly lower by bending the standing knee — keep it tracking over your toes.',
+    'Lower as deep as possible, ideally until your hamstring touches your calf.',
+    'Drive through your heel to return to standing.',
+  ],
+  commonErrors: [
+    { error: 'Standing knee collapsing inward (valgus)', cameraDetection: 'Knee X drifts medially past foot X during descent' },
+    { error: 'Excessive forward trunk lean', cameraDetection: 'Shoulder-hip angle > 45° from vertical' },
+    { error: 'Not reaching full depth', cameraDetection: 'Knee flexion < 110° at bottom' },
+    { error: 'Using momentum instead of controlled descent', cameraDetection: 'Rep duration < 300 ms' },
+  ],
+  breathing: 'Inhale on the way down — exhale as you drive back up.',
+  modifications: {
+    easier: ['Box pistol (squat to a chair)', 'Assisted pistol with a TRX or pole', 'Bulgarian split squat'],
+    harder: ['Weighted pistol squat', 'Deficit pistol', 'Slow tempo pistol'],
+  },
+  guidanceModes: { imageText: true, videoAudio: false, cameraVision: 'full' },
+  exerciseType: 'rep-based',
+  isStrength: true,
+  defaultSets: 3,
+  defaultRepsPerSet: 5,
+  defaultRestSec: 90,
+  safetyChecks: [
+    'Requires adequate ankle dorsiflexion and hip mobility.',
+    'Avoid if you have knee or hip pain.',
+    'Build up strength with split squats first.',
+  ],
+  engineModule: 'pistol-squat',
+  images: { hero: 'svg:pistol-squat-hero', steps: [] },
+  videoUrl: undefined,
+};

@@ -51,6 +51,20 @@ import { PullUpEngine } from '@/modules/pull-up/engine';
 import { OverheadPressEngine } from '@/modules/overhead-press/engine';
 import { BarbellRowEngine } from '@/modules/barbell-row/engine';
 import { RomanianDeadliftEngine } from '@/modules/romanian-deadlift/engine';
+// New exercises (Bilal's round 2)
+import { HammerCurlEngine } from '@/modules/hammer-curl/engine';
+import { KettlebellSwingEngine } from '@/modules/kettlebell-swing/engine';
+import { MountainClimberEngine } from '@/modules/mountain-climber/engine';
+import { BurpeeEngine } from '@/modules/burpee/engine';
+import { BoxJumpEngine } from '@/modules/box-jump/engine';
+import { StarJumpEngine } from '@/modules/star-jump/engine';
+import { GluteBridgeEngine } from '@/modules/glute-bridge/engine';
+import { OTEEngine } from '@/modules/overhead-tricep-extension/engine';
+import { BroadJumpEngine } from '@/modules/broad-jump/engine';
+import { ChairDipEngine } from '@/modules/chair-dip/engine';
+import { InchwormEngine } from '@/modules/inchworm/engine';
+import { JumpSquatEngine } from '@/modules/jump-squat/engine';
+import { ShrugEngine } from '@/modules/shrug/engine';
 import type { CalibrationUpdate, FrameMetrics } from '@/modules/squat/types';
 import type { PoseLandmarks } from '@/modules/pose/types';
 import type { ExerciseEngine } from '@/modules/engine-interface';
@@ -199,6 +213,46 @@ const WARNING_PRIORITY: Record<WarningType, number> = {
   'rdl-back-rounded': 4,
   'excessive-knee-bend': 3,
   'incomplete-rdl': 3,
+  // New exercises (Bilal's round 2)
+  'squat-pattern': 4,
+  'arm-lift': 3,
+  'incomplete-extension': 3,
+  'no-jump': 3,
+  'incomplete-plank': 3,
+  'stiff-landing': 4,
+  'no-loading': 3,
+  'incomplete-jump': 3,
+  'incomplete-drive': 3,
+  'above-parallel': 3,
+  'incomplete-star-jump': 3,
+  'incomplete-bridge': 3,
+  'incomplete-tricep-extension': 3,
+  'incomplete-dip': 3,
+  'hip-lift-off': 4,
+  'incomplete-dead-bug': 3,
+  'incomplete-inchworm': 3,
+  'incomplete-jump-squat': 3,
+  'incomplete-shrug': 3,
+  'incomplete-superman': 3,
+  'incomplete-bird-dog': 3,
+  'incomplete-step-up': 3,
+  'incomplete-walking-lunge': 3,
+  'incomplete-reverse-fly': 3,
+  'goblet-elbows-collapsing': 2,
+  'incomplete-goblet-squat': 3,
+  'incomplete-donkey-kick': 3,
+  'incomplete-fire-hydrant': 3,
+  'incomplete-curtsy-lunge': 3,
+  'hip-rotation-curtsy': 3,
+  'trunk-lean': 3,
+  'knee-valgus': 4,
+  'incomplete-pallof-press': 3,
+  'torso-rotation-pallof': 4,
+  'steps-not-tracked': 3,
+  'hip-drop': 3,
+  'incomplete-pistol-squat': 3,
+  'incomplete-nordic-curl': 3,
+  'incomplete-clamshell': 3,
 };
 
 // 2026-05-25 Issue 2: voice coaching during calibration based on most-blocking
@@ -297,6 +351,47 @@ const WARNING_SPEECH: Record<WarningType, string> = {
   'rdl-back-rounded': 'Keep your back flat. Hinge from the hips, not the spine.',
   'excessive-knee-bend': 'Keep your knees soft but fixed. Do not squat down.',
   'incomplete-rdl': 'Hinge deeper. Push your hips back further.',
+  // New exercises (Bilal's round 2)
+  'squat-pattern': 'Drive from your hips, not your knees. This is a hinge, not a squat.',
+  'arm-lift': 'Let your arms swing passively. The power comes from your hips.',
+  'incomplete-extension': 'Snap your hips fully. Stand tall and squeeze your glutes at the top.',
+  'no-jump': 'Finish with a jump. Explode up at the end of each burpee.',
+  'incomplete-plank': 'Get into plank position. Extend your legs fully before pushing back up.',
+  'stiff-landing': 'Bend your knees on landing. Absorb the impact softly.',
+  'no-loading': 'Dip first. Bend your knees to load before jumping.',
+  'incomplete-jump': 'Jump higher. Get full extension off the ground.',
+  'incomplete-drive': 'Drive your knee all the way to your chest for a full rep.',
+  'above-parallel': 'Lower your arms slightly. Raise only to shoulder height.',
+  'incomplete-raise': 'Raise higher. Bring your arms to shoulder level.',
+  'incomplete-star-jump': 'Raise your arms fully overhead. Reach all the way up.',
+  'incomplete-bridge': 'Drive your hips higher. Squeeze your glutes at the top.',
+  'incomplete-tricep-extension': 'Lower further. Bring the weight deeper behind your head.',
+  'incomplete-dip': 'Dip lower. Bend your elbows to ninety degrees.',
+  'hip-lift-off': 'Press your lower back into the mat. Your hips are lifting.',
+  'incomplete-dead-bug': 'Extend further. Straighten your leg closer to the floor.',
+  'incomplete-inchworm': 'Fold deeper. Reach your hands closer to the floor.',
+  'incomplete-jump-squat': 'Jump higher. Push through the full range.',
+  'incomplete-shrug': 'Shrug higher. Elevate your shoulders fully.',
+  'incomplete-superman': 'Lift higher. Chest and legs off the floor.',
+  'incomplete-bird-dog': 'Extend further. Straighten your arm and leg fully.',
+  'incomplete-step-up': 'Drive higher. Push all the way up onto the step.',
+  'incomplete-walking-lunge': 'Lower further. Front thigh closer to parallel.',
+  'incomplete-reverse-fly': 'Raise higher. Lift both arms to shoulder height.',
+  'goblet-elbows-collapsing': 'Spread elbows apart. Push them outward.',
+  'incomplete-goblet-squat': 'Squat deeper. Reach hip level.',
+  'incomplete-donkey-kick': 'Kick higher. Drive heel toward the ceiling.',
+  'incomplete-fire-hydrant': 'Lift higher. Raise your knee out to the side.',
+  'incomplete-curtsy-lunge': 'Lower deeper. Rear knee closer to the floor.',
+  'hip-rotation-curtsy': "Keep hips square. Don't let the hip swing out.",
+  'trunk-lean': 'Stand taller. Keep your torso upright.',
+  'knee-valgus': "Knees out. Don't let them cave in.",
+  'incomplete-pallof-press': 'Press fully. Arms straight out from chest.',
+  'torso-rotation-pallof': 'Resist the pull. Keep your torso facing forward.',
+  'steps-not-tracked': 'Stay in frame. Take smaller steps sideways.',
+  'hip-drop': "Level your hips. Don't let them drop to the side.",
+  'incomplete-pistol-squat': 'Go deeper on the squat.',
+  'incomplete-nordic-curl': 'Lower further for a full rep.',
+  'incomplete-clamshell': 'Open your knee higher.',
 };
 
 export default function PlayPage({ params }: { params: { exerciseId: string } }) {
@@ -855,6 +950,189 @@ export default function PlayPage({ params }: { params: { exerciseId: string } })
             onRepComplete: (r) => mounted && handleRepComplete(r),
             onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
           });
+        } else if (exercise.engineModule === 'hammer-curl') {
+          engineRef.current = new HammerCurlEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'kettlebell-swing') {
+          engineRef.current = new KettlebellSwingEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'mountain-climber') {
+          engineRef.current = new MountainClimberEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'burpee') {
+          engineRef.current = new BurpeeEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'box-jump') {
+          engineRef.current = new BoxJumpEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'star-jump') {
+          engineRef.current = new StarJumpEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'glute-bridge') {
+          engineRef.current = new GluteBridgeEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'overhead-tricep-extension') {
+          engineRef.current = new OTEEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'broad-jump') {
+          engineRef.current = new BroadJumpEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'chair-dip') {
+          engineRef.current = new ChairDipEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'dead-bug') {
+          const { DeadBugEngine } = await import('@/modules/dead-bug/engine');
+          engineRef.current = new DeadBugEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'inchworm') {
+          engineRef.current = new InchwormEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'jump-squat') {
+          engineRef.current = new JumpSquatEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'shrug') {
+          engineRef.current = new ShrugEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'superman') {
+          const { SupermanEngine } = await import('@/modules/superman/engine');
+          engineRef.current = new SupermanEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'bird-dog') {
+          const { BirdDogEngine } = await import('@/modules/bird-dog/engine');
+          engineRef.current = new BirdDogEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'step-up') {
+          const { StepUpEngine } = await import('@/modules/step-up/engine');
+          engineRef.current = new StepUpEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'walking-lunge') {
+          const { WalkingLungeEngine } = await import('@/modules/walking-lunge/engine');
+          engineRef.current = new WalkingLungeEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'reverse-fly') {
+          const { ReverseFlyEngine } = await import('@/modules/reverse-fly/engine');
+          engineRef.current = new ReverseFlyEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'goblet-squat') {
+          const { GobletSquatEngine } = await import('@/modules/goblet-squat/engine');
+          engineRef.current = new GobletSquatEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'donkey-kick') {
+          const { DonkeyKickEngine } = await import('@/modules/donkey-kick/engine');
+          engineRef.current = new DonkeyKickEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'fire-hydrant') {
+          const { FireHydrantEngine } = await import('@/modules/fire-hydrant/engine');
+          engineRef.current = new FireHydrantEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'curtsy-lunge') {
+          const { CurtsyLungeEngine } = await import('@/modules/curtsy-lunge/engine');
+          engineRef.current = new CurtsyLungeEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete({ depthDeg: r.peakDepthDeg, smoothness: r.smoothness, form: r.form, mqs: r.mqs, warnings: r.warnings }),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'pallof-press') {
+          const { PallofPressEngine } = await import('@/modules/pallof-press/engine');
+          engineRef.current = new PallofPressEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'lateral-band-walk') {
+          const { LateralBandWalkEngine } = await import('@/modules/lateral-band-walk/engine');
+          engineRef.current = new LateralBandWalkEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete({ depthDeg: r.peakDisplacement, smoothness: 100, form: 100, mqs: r.mqs, warnings: r.warnings }),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'pistol-squat') {
+          const { PistolSquatEngine } = await import('@/modules/pistol-squat/engine');
+          engineRef.current = new PistolSquatEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete({ depthDeg: r.depthDeg, smoothness: r.smoothness, form: r.form, mqs: r.mqs, warnings: r.warnings }),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'nordic-curl') {
+          const { NordicCurlEngine } = await import('@/modules/nordic-curl/engine');
+          engineRef.current = new NordicCurlEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete(r),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
+        } else if (exercise.engineModule === 'clamshell') {
+          const { ClamshellEngine } = await import('@/modules/clamshell/engine');
+          engineRef.current = new ClamshellEngine({
+            ...sharedCallbacks,
+            onRepComplete: (r) => mounted && handleRepComplete({ depthDeg: r.peakOpenFrac * 100, smoothness: r.smoothness, form: r.form, mqs: r.mqs, warnings: r.warnings }),
+            onFrame: (f) => mounted && setLatestFrame(f as unknown as FrameMetrics),
+          });
         } else {
           engineRef.current = new SquatEngine({
             ...sharedCallbacks,
@@ -1138,6 +1416,62 @@ export default function PlayPage({ params }: { params: { exerciseId: string } })
                   <>Lie face down, side-on to camera<br />Hands under shoulders, lift your chest</>
                 ) : exercise?.engineModule === 'seated-forward-fold' ? (
                   <>Sit on the floor, side-on to camera<br />Legs straight out, fold forward over them</>
+                ) : exercise?.engineModule === 'hammer-curl' ? (
+                  <>Stand tall facing the camera<br />Arms relaxed at your sides</>
+                ) : exercise?.engineModule === 'kettlebell-swing' ? (
+                  <>Stand side-on to camera, KB stance<br />Feet slightly wider than hip-width</>
+                ) : exercise?.engineModule === 'mountain-climber' ? (
+                  <>Get into high plank position<br />Side-on to camera</>
+                ) : exercise?.engineModule === 'burpee' ? (
+                  <>Stand side-on to camera, feet shoulder-width</>
+                ) : exercise?.engineModule === 'box-jump' ? (
+                  <>Stand side-on to camera, jump stance<br />Feet shoulder-width, arms at sides</>
+                ) : exercise?.engineModule === 'star-jump' ? (
+                  <>Stand facing the camera<br />Feet together, arms at sides</>
+                ) : exercise?.engineModule === 'glute-bridge' ? (
+                  <>Lie on your back, side-on to camera<br />Knees bent, feet flat, hips down</>
+                ) : exercise?.engineModule === 'overhead-tricep-extension' ? (
+                  <>Stand facing the camera<br />Arms fully extended overhead, dumbbell held with both hands</>
+                ) : exercise?.engineModule === 'broad-jump' ? (
+                  <>Stand facing the camera<br />Feet shoulder-width, arms at sides</>
+                ) : exercise?.engineModule === 'chair-dip' ? (
+                  <>Sit on the chair edge, slide off<br />Arms straight, facing camera</>
+                ) : exercise?.engineModule === 'dead-bug' ? (
+                  <>Lie on your back — side camera</>
+                ) : exercise?.engineModule === 'inchworm' ? (
+                  <>Stand facing the camera<br />Feet hip-width, arms at sides</>
+                ) : exercise?.engineModule === 'jump-squat' ? (
+                  <>Stand facing the camera<br />Feet shoulder-width, arms at sides</>
+                ) : exercise?.engineModule === 'shrug' ? (
+                  <>Stand facing the camera<br />Arms relaxed at sides, weights in hands</>
+                ) : exercise?.engineModule === 'superman' ? (
+                  <>Lie face-down — side camera<br />Arms extended, legs straight</>
+                ) : exercise?.engineModule === 'bird-dog' ? (
+                  <>Position sideways — camera to your side<br />On hands and knees, body level</>
+                ) : exercise?.engineModule === 'step-up' ? (
+                  <>Stand facing the camera<br />Step or chair just behind you</>
+                ) : exercise?.engineModule === 'walking-lunge' ? (
+                  <>Stand facing the camera<br />Feet hip-width, arms at sides</>
+                ) : exercise?.engineModule === 'reverse-fly' ? (
+                  <>Hinge forward at hips — about 45°<br />Arms hanging down, hold dumbbells or band</>
+                ) : exercise?.engineModule === 'goblet-squat' ? (
+                  <>Stand facing the camera<br />Hold weight at chest, elbows spread out</>
+                ) : exercise?.engineModule === 'donkey-kick' ? (
+                  <>Position sideways — camera to your side<br />On hands and knees, body level</>
+                ) : exercise?.engineModule === 'fire-hydrant' ? (
+                  <>Position sideways — camera to your side<br />On hands and knees, body level</>
+                ) : exercise?.engineModule === 'curtsy-lunge' ? (
+                  <>Stand facing the camera<br />Feet hip-width, arms relaxed at sides</>
+                ) : exercise?.engineModule === 'pallof-press' ? (
+                  <>Stand facing the camera<br />Band/cable at chest height, elbows bent</>
+                ) : exercise?.engineModule === 'lateral-band-walk' ? (
+                  <>Stand facing the camera<br />Band around ankles, feet hip-width</>
+                ) : exercise?.engineModule === 'pistol-squat' ? (
+                  <>Stand facing the camera<br />Feet together, arms relaxed at sides</>
+                ) : exercise?.engineModule === 'nordic-curl' ? (
+                  <>Kneel sideways to the camera<br />Torso upright, hips extended</>
+                ) : exercise?.engineModule === 'clamshell' ? (
+                  <>Lie on your side facing the camera<br />Knees bent, hips stacked</>
                 ) : isHoldBased ? (
                   <>Side-on to camera, get into<br />plank position</>
                 ) : (
@@ -1222,6 +1556,62 @@ export default function PlayPage({ params }: { params: { exerciseId: string } })
                                         ? 'Full body in frame, side-on (lying down)'
                                       : exercise?.engineModule === 'seated-forward-fold'
                                         ? 'Full body in frame, side-on (seated)'
+                                      : exercise?.engineModule === 'hammer-curl'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'kettlebell-swing'
+                                        ? 'Full body visible in frame'
+                                      : exercise?.engineModule === 'mountain-climber'
+                                        ? 'Full body visible in frame'
+                                      : exercise?.engineModule === 'burpee'
+                                        ? 'Full body visible'
+                                      : exercise?.engineModule === 'box-jump'
+                                        ? 'Full body visible in frame'
+                                      : exercise?.engineModule === 'star-jump'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'glute-bridge'
+                                        ? 'Full body in frame (shoulder to ankle)'
+                                      : exercise?.engineModule === 'overhead-tricep-extension'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'broad-jump'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'chair-dip'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'dead-bug'
+                                        ? 'Body visible from the side'
+                                      : exercise?.engineModule === 'inchworm'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'jump-squat'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'shrug'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'superman'
+                                        ? 'Full body in frame (shoulder to ankle)'
+                                      : exercise?.engineModule === 'bird-dog'
+                                        ? 'Full body in frame (shoulder to ankle)'
+                                      : exercise?.engineModule === 'step-up'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'walking-lunge'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'reverse-fly'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'goblet-squat'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'donkey-kick'
+                                        ? 'Full body in frame (shoulder to ankle)'
+                                      : exercise?.engineModule === 'fire-hydrant'
+                                        ? 'Full body in frame (shoulder to ankle)'
+                                      : exercise?.engineModule === 'curtsy-lunge'
+                                        ? 'Full body in frame (head to feet)'
+                                      : exercise?.engineModule === 'pallof-press'
+                                        ? 'Full body in frame'
+                                      : exercise?.engineModule === 'lateral-band-walk'
+                                        ? 'Full body in frame (head to feet)'
+                                      : exercise?.engineModule === 'pistol-squat'
+                                        ? 'Full body in frame (head to feet)'
+                                      : exercise?.engineModule === 'nordic-curl'
+                                        ? 'Side profile in frame'
+                                      : exercise?.engineModule === 'clamshell'
+                                        ? 'Full body in frame (lying on side)'
                                       : isHoldBased
                                         ? 'Side profile in frame'
                                         : 'Full body in frame'
@@ -1306,6 +1696,62 @@ export default function PlayPage({ params }: { params: { exerciseId: string } })
                                           ? 'Lying prone — legs flat on the floor'
                                         : exercise?.engineModule === 'seated-forward-fold'
                                           ? 'Legs straight out along the floor'
+                                        : exercise?.engineModule === 'hammer-curl'
+                                          ? 'Feet about shoulder-width, stable'
+                                        : exercise?.engineModule === 'kettlebell-swing'
+                                          ? 'Side profile — turn 90° to camera'
+                                        : exercise?.engineModule === 'mountain-climber'
+                                          ? 'Body horizontal — side view'
+                                        : exercise?.engineModule === 'burpee'
+                                          ? 'Side profile — turn 90° to camera'
+                                        : exercise?.engineModule === 'box-jump'
+                                          ? 'Side profile — turn 90° to camera'
+                                        : exercise?.engineModule === 'star-jump'
+                                          ? 'Feet together (not spread wide)'
+                                        : exercise?.engineModule === 'glute-bridge'
+                                          ? 'Knees bent — raised above hip level'
+                                        : exercise?.engineModule === 'overhead-tricep-extension'
+                                          ? 'Feet about shoulder-width, stable'
+                                        : exercise?.engineModule === 'broad-jump'
+                                          ? 'Feet about shoulder-width'
+                                        : exercise?.engineModule === 'chair-dip'
+                                          ? 'Feet shoulder-width, stable'
+                                        : exercise?.engineModule === 'dead-bug'
+                                          ? 'Knees raised in tabletop position'
+                                        : exercise?.engineModule === 'inchworm'
+                                          ? 'Feet about hip-width, standing tall'
+                                        : exercise?.engineModule === 'jump-squat'
+                                          ? 'Feet about shoulder-width apart'
+                                        : exercise?.engineModule === 'shrug'
+                                          ? 'Feet about shoulder-width, stable'
+                                        : exercise?.engineModule === 'superman'
+                                          ? 'Body horizontal — lying prone'
+                                        : exercise?.engineModule === 'bird-dog'
+                                          ? 'Body horizontal — hands and knees on the floor'
+                                        : exercise?.engineModule === 'step-up'
+                                          ? 'Feet about hip-width, standing tall'
+                                        : exercise?.engineModule === 'walking-lunge'
+                                          ? 'Feet hip-width — not shoulder-width'
+                                        : exercise?.engineModule === 'reverse-fly'
+                                          ? 'Bent forward — torso at 45° to floor'
+                                        : exercise?.engineModule === 'goblet-squat'
+                                          ? 'Feet shoulder-width, toes slightly out'
+                                        : exercise?.engineModule === 'donkey-kick'
+                                          ? 'Body horizontal — hands and knees on the floor'
+                                        : exercise?.engineModule === 'fire-hydrant'
+                                          ? 'Body horizontal — hands and knees on the floor'
+                                        : exercise?.engineModule === 'curtsy-lunge'
+                                          ? 'Feet hip-width apart, standing tall'
+                                        : exercise?.engineModule === 'pallof-press'
+                                          ? 'Feet shoulder-width, knees soft'
+                                        : exercise?.engineModule === 'lateral-band-walk'
+                                          ? 'Feet hip-width with band around ankles'
+                                        : exercise?.engineModule === 'pistol-squat'
+                                          ? 'Feet together, standing upright'
+                                        : exercise?.engineModule === 'nordic-curl'
+                                          ? 'Kneeling upright, hips extended'
+                                        : exercise?.engineModule === 'clamshell'
+                                          ? 'Knees bent ~45°, feet together'
                                         : isHoldBased
                                           ? 'Body horizontal (head to heels)'
                                           : 'Feet wider than shoulders'
@@ -1390,6 +1836,62 @@ export default function PlayPage({ params }: { params: { exerciseId: string } })
                                           ? 'Chest lifted off the floor'
                                         : exercise?.engineModule === 'seated-forward-fold'
                                           ? 'Fold forward over your legs'
+                                        : exercise?.engineModule === 'hammer-curl'
+                                          ? 'Both arms straight down at sides'
+                                        : exercise?.engineModule === 'kettlebell-swing'
+                                          ? 'Arms relaxed at sides'
+                                        : exercise?.engineModule === 'mountain-climber'
+                                          ? 'Arms fully straight — high plank position'
+                                        : exercise?.engineModule === 'burpee'
+                                          ? 'Arms relaxed at sides'
+                                        : exercise?.engineModule === 'box-jump'
+                                          ? 'Arms relaxed at sides'
+                                        : exercise?.engineModule === 'star-jump'
+                                          ? 'Arms relaxed at sides (not raised)'
+                                        : exercise?.engineModule === 'glute-bridge'
+                                          ? 'Hips down — resting on the floor'
+                                        : exercise?.engineModule === 'overhead-tricep-extension'
+                                          ? 'Both arms fully extended overhead'
+                                        : exercise?.engineModule === 'broad-jump'
+                                          ? 'Arms relaxed at sides'
+                                        : exercise?.engineModule === 'chair-dip'
+                                          ? 'Both arms straight down — elbows extended'
+                                        : exercise?.engineModule === 'dead-bug'
+                                          ? 'Arms extended up toward ceiling'
+                                        : exercise?.engineModule === 'inchworm'
+                                          ? 'Arms relaxed at sides'
+                                        : exercise?.engineModule === 'jump-squat'
+                                          ? 'Arms relaxed at sides (not raised)'
+                                        : exercise?.engineModule === 'shrug'
+                                          ? 'Arms relaxed at sides (not raised)'
+                                        : exercise?.engineModule === 'superman'
+                                          ? 'Arms extended, hips on the floor'
+                                        : exercise?.engineModule === 'bird-dog'
+                                          ? 'Hands below shoulders, arms hanging down'
+                                        : exercise?.engineModule === 'step-up'
+                                          ? 'Arms relaxed at sides'
+                                        : exercise?.engineModule === 'walking-lunge'
+                                          ? 'Arms relaxed at sides (not raised)'
+                                        : exercise?.engineModule === 'reverse-fly'
+                                          ? 'Arms hanging down, hands below shoulders'
+                                        : exercise?.engineModule === 'goblet-squat'
+                                          ? 'Weight at chest — elbows pushed out to sides'
+                                        : exercise?.engineModule === 'donkey-kick'
+                                          ? 'Hands below shoulders, arms straight down'
+                                        : exercise?.engineModule === 'fire-hydrant'
+                                          ? 'Hands below shoulders, arms straight down'
+                                        : exercise?.engineModule === 'curtsy-lunge'
+                                          ? 'Arms relaxed at sides (not raised)'
+                                        : exercise?.engineModule === 'pallof-press'
+                                          ? 'Hands at chest holding band (not extended yet)'
+                                        : exercise?.engineModule === 'lateral-band-walk'
+                                          ? 'Hands on hips or arms at sides'
+                                        : exercise?.engineModule === 'pistol-squat'
+                                          ? 'Arms extended forward for balance'
+                                        : exercise?.engineModule === 'nordic-curl'
+                                          ? 'Arms crossed or extended in front'
+                                        : exercise?.engineModule === 'clamshell'
+                                          ? 'Top arm resting on your hip'
                                         : isHoldBased
                                           ? 'Forearms / hands under shoulders'
                                           : 'Both arms overhead'

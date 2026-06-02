@@ -13,7 +13,7 @@
  *   further outward by another half-flexion. Result: a perfect symmetric squat.
  */
 import type { NormalizedLandmark, PoseLandmarks } from '@/modules/pose/types';
-import { IDX, LM_COUNT, type SquatPoseIntent, type PlankPoseIntent, type PushupPoseIntent, type LungePoseIntent, type LateralLungePoseIntent, type TandemStandPoseIntent, type BicepCurlPoseIntent, type SingleLegStandPoseIntent, type StarPosePoseIntent, type ChairPosePoseIntent, type LateralRaisePoseIntent, type TreePosePoseIntent, type StandingFigure4PoseIntent, type GatePosePoseIntent, type CossackSquatPoseIntent, type CatCowPoseIntent, type WarriorTwoPoseIntent, type WarriorOnePoseIntent, type Warrior3PoseIntent, type SidePlankPoseIntent, type BoatPosePoseIntent, type MountainPosePoseIntent, type CalfRaisePoseIntent, type JumpingJacksPoseIntent, type HighKneesPoseIntent, type FrontRaisePoseIntent, type ArmCirclesPoseIntent, type GoddessPosePoseIntent, type TrianglePosePoseIntent, type WallSitPoseIntent, type SideLegRaisePoseIntent, type ObliqueSideBendPoseIntent, type ForwardFoldPoseIntent, type DownwardDogPoseIntent, type CobraPosePoseIntent, type SeatedMarchPoseIntent, type SeatedForwardFoldPoseIntent, type DeadliftPoseIntent, type PullUpPoseIntent, type OverheadPressPoseIntent, type RomanianDeadliftPoseIntent, type BarbellRowPoseIntent } from './types';
+import { IDX, LM_COUNT, type SquatPoseIntent, type PlankPoseIntent, type PushupPoseIntent, type LungePoseIntent, type LateralLungePoseIntent, type TandemStandPoseIntent, type BicepCurlPoseIntent, type SingleLegStandPoseIntent, type StarPosePoseIntent, type ChairPosePoseIntent, type LateralRaisePoseIntent, type TreePosePoseIntent, type StandingFigure4PoseIntent, type GatePosePoseIntent, type CossackSquatPoseIntent, type CatCowPoseIntent, type WarriorTwoPoseIntent, type WarriorOnePoseIntent, type Warrior3PoseIntent, type SidePlankPoseIntent, type BoatPosePoseIntent, type MountainPosePoseIntent, type CalfRaisePoseIntent, type JumpingJacksPoseIntent, type HighKneesPoseIntent, type FrontRaisePoseIntent, type ArmCirclesPoseIntent, type GoddessPosePoseIntent, type TrianglePosePoseIntent, type WallSitPoseIntent, type SideLegRaisePoseIntent, type ObliqueSideBendPoseIntent, type ForwardFoldPoseIntent, type DownwardDogPoseIntent, type CobraPosePoseIntent, type SeatedMarchPoseIntent, type SeatedForwardFoldPoseIntent, type DeadliftPoseIntent, type PullUpPoseIntent, type OverheadPressPoseIntent, type RomanianDeadliftPoseIntent, type BarbellRowPoseIntent, type HammerCurlPoseIntent, type KBSwingPoseIntent, type MountainClimberPoseIntent, type BurpeePoseIntent, type BoxJumpPoseIntent, type StarJumpPoseIntent, type GluteBridgePoseIntent, type OTEPoseIntent, type BroadJumpPoseIntent, type JumpSquatPoseIntent, type ChairDipPoseIntent, type DeadBugPoseIntent, type InchwormPoseIntent, type SupermanPoseIntent, type ShrugPoseIntent, type BirdDogPoseIntent, type StepUpPoseIntent, type WalkingLungePoseIntent, type ReverseFlyPoseIntent, type DonkeyKickPoseIntent, type GobletSquatPoseIntent, type FireHydrantPoseIntent, type CurtsyLungePoseIntent, type PallofPressPoseIntent, type LateralBandWalkPoseIntent } from './types';
 
 // ─── Deterministic PRNG (mulberry32) ───
 function mulberry32(seed: number): () => number {
@@ -4323,5 +4323,2645 @@ export function buildRowPose(intent: BarbellRowPoseIntent): PoseLandmarks {
 
   applyNoise(pose, noise, seed);
   applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ====================================================================
+// New exercise pose builders (ported from kriya-mirror)
+// ====================================================================
+// ------------------------------------------------------------------------
+// CHAIR DIP â€” front-facing standing pose, bilateral elbow flexion.
+// Same body layout as buildBicepCurlPose; elbowFlareX spreads elbows outward.
+// ------------------------------------------------------------------------
+
+export function buildChairDipPose(intent: ChairDipPoseIntent): PoseLandmarks {
+  const {
+    elbowFlexionDeg: bilateralFlex,
+    leftElbowFlexionDeg,
+    rightElbowFlexionDeg,
+    feetWidthRatio = 1.0,
+    torsoSwayX = 0,
+    elbowFlareX = 0,
+    bodyHeight = 0.70,
+    shoulderDescentY = 0,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const leftFlex = leftElbowFlexionDeg ?? bilateralFlex;
+  const rightFlex = rightElbowFlexionDeg ?? bilateralFlex;
+
+  const pose = emptyPose();
+
+  // Body layout (same as buildBicepCurlPose)
+  const bodyTopY = (1 - bodyHeight) / 2;
+  const headY = bodyTopY;
+  // shoulderDescentY shifts shoulder (and all landmarks below it) downward
+  // to simulate the torso lowering during a real chair dip.
+  const shoulderY = headY + bodyHeight * 0.12 + shoulderDescentY;
+  const hipY = shoulderY + bodyHeight * 0.50;
+  const kneeY = hipY + bodyHeight * 0.22;
+  const ankleY = hipY + bodyHeight * 0.48;
+
+  const centerX = 0.5 + torsoSwayX;
+  const shoulderHalfW = 0.10;
+  const lsX = centerX - shoulderHalfW;
+  const rsX = centerX + shoulderHalfW;
+
+  const feetHalfW = shoulderHalfW * feetWidthRatio;
+  const laX = centerX - feetHalfW;
+  const raX = centerX + feetHalfW;
+
+  const mk = (x: number, y: number) => ({ x, y, z: 0, visibility });
+
+  // Head
+  pose[IDX.nose] = mk(centerX, headY);
+  pose[IDX.leftEar] = mk(lsX - 0.03, headY + 0.02);
+  pose[IDX.rightEar] = mk(rsX + 0.03, headY + 0.02);
+
+  // Shoulders
+  pose[IDX.leftShoulder] = mk(lsX, shoulderY);
+  pose[IDX.rightShoulder] = mk(rsX, shoulderY);
+
+  // Hips
+  pose[IDX.leftHip] = mk(centerX - 0.07, hipY);
+  pose[IDX.rightHip] = mk(centerX + 0.07, hipY);
+
+  // Knees / ankles
+  pose[IDX.leftKnee] = mk(laX, kneeY);
+  pose[IDX.rightKnee] = mk(raX, kneeY);
+  pose[IDX.leftAnkle] = mk(laX, ankleY);
+  pose[IDX.rightAnkle] = mk(raX, ankleY);
+  pose[IDX.leftHeel] = mk(laX - 0.01, ankleY + 0.01);
+  pose[IDX.rightHeel] = mk(raX + 0.01, ankleY + 0.01);
+  pose[IDX.leftFootIndex] = mk(laX + 0.01, ankleY + 0.02);
+  pose[IDX.rightFootIndex] = mk(raX - 0.01, ankleY + 0.02);
+
+  // Arms â€” elbow flexion geometry (same isoceles triangle approach as buildBicepCurlPose)
+  const upperArmLen = bodyHeight * 0.18;
+  const foreArmLen = bodyHeight * 0.16;
+
+  function dipArmGeometry(shoulderX: number, flexDeg: number, sign: -1 | 1, flareX: number) {
+    const flexRad = (flexDeg * Math.PI) / 180;
+    // Elbow hangs below shoulder
+    const elbowX = shoulderX + sign * flareX;
+    const elbowY = shoulderY + upperArmLen;
+    // Forearm: at flexDeg, swings sign-ward and downward from the elbow.
+    // wristY = elbowY + cos: arm straight down at 0Â°, horizontal at 90Â°.
+    const wristX = elbowX + sign * foreArmLen * Math.sin(flexRad);
+    const wristY = elbowY + foreArmLen * Math.cos(flexRad);
+    return { elbowX, elbowY, wristX, wristY };
+  }
+
+  const left = dipArmGeometry(lsX, leftFlex, -1, elbowFlareX);
+  const right = dipArmGeometry(rsX, rightFlex, 1, elbowFlareX);
+
+  pose[IDX.leftElbow] = mk(left.elbowX, left.elbowY);
+  pose[IDX.rightElbow] = mk(right.elbowX, right.elbowY);
+  pose[IDX.leftWrist] = mk(left.wristX, left.wristY);
+  pose[IDX.rightWrist] = mk(right.wristX, right.wristY);
+
+  void bodyHeight;
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// HAMMER CURL â€” identical geometry to BICEP CURL from front camera.
+// Neutral grip (thumbs up) looks the same as supinated grip in 2D.
+// ------------------------------------------------------------------------
+
+export function buildHammerCurlPose(intent: HammerCurlPoseIntent): PoseLandmarks {
+  return buildBicepCurlPose(intent as BicepCurlPoseIntent);
+}
+export function buildMountainClimberPose(intent: MountainClimberPoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    // Invisible pose (occlusion / position-lost)
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i].visibility = 0;
+    return pose;
+  }
+  const {
+    kneeHipAngleDeg: targetAngle,
+    hipDeviation = 0,
+    side = 'left',
+    bodyLength = 0.55,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  // Plank geometry: horizontal body
+  // shoulder at left side, ankle at right side (for left-facing)
+  const shoulderX = 0.15;
+  const ankleX = shoulderX + bodyLength;
+  const hipX = (shoulderX + ankleX) / 2;
+  const baseY = 0.50;  // plank Y level
+
+  const shoulderY = baseY;
+  const ankleY = baseY;
+  // Hip: at midpoint Y with optional deviation
+  const hipY = baseY + hipDeviation;
+
+  // Wrist: directly below shoulder (plank hands position)
+  const wristX = shoulderX;
+  const wristY = baseY + 0.12;
+  // Elbow: between shoulder and wrist
+  const elbowX = shoulderX;
+  const elbowY = baseY + 0.06;
+
+  // Driving knee position based on target angle:
+  // The shoulderâ†’hipâ†’knee angle is measured at the hip vertex.
+  // Vector hipâ†’shoulder = (shoulderX - hipX, shoulderY - hipY).
+  // We place the knee at unit distance from hip, at angle `targetAngle`
+  // from the hipâ†’shoulder direction.
+  const hipToShoulderX = shoulderX - hipX;
+  const hipToShoulderY = shoulderY - hipY;
+  const hipToShoulderLen = Math.sqrt(hipToShoulderX * hipToShoulderX + hipToShoulderY * hipToShoulderY);
+  // Normalize
+  const ushX = hipToShoulderLen > 0 ? hipToShoulderX / hipToShoulderLen : -1;
+  const ushY = hipToShoulderLen > 0 ? hipToShoulderY / hipToShoulderLen : 0;
+
+  // Rotate by -targetAngle (negative = toward ankle side = plank rest position)
+  // At 170Â°: knee is on the opposite side from shoulder (behind hip = toward ankle)
+  // At 50Â°:  knee is near shoulder direction (forward = toward chest)
+  const angleRad = (targetAngle * Math.PI) / 180;
+  // Use rotation formula: rotate the hipâ†’shoulder unit vector by angleRad
+  const kneeDirX = ushX * Math.cos(angleRad) + ushY * Math.sin(angleRad);
+  const kneeDirY = -ushX * Math.sin(angleRad) + ushY * Math.cos(angleRad);
+
+  const kneeLimbLen = 0.20; // approx upper-leg length in normalized coords
+  const kneeX = hipX + kneeDirX * kneeLimbLen;
+  const kneeY = hipY + kneeDirY * kneeLimbLen;
+
+  // Side indices
+  const visSh = side === 'left' ? IDX.leftShoulder : IDX.rightShoulder;
+  const hidSh = side === 'left' ? IDX.rightShoulder : IDX.leftShoulder;
+  const visHip = side === 'left' ? IDX.leftHip : IDX.rightHip;
+  const hidHip = side === 'left' ? IDX.rightHip : IDX.leftHip;
+  const visAnkle = side === 'left' ? IDX.leftAnkle : IDX.rightAnkle;
+  const hidAnkle = side === 'left' ? IDX.rightAnkle : IDX.leftAnkle;
+  const visElbow = side === 'left' ? IDX.leftElbow : IDX.rightElbow;
+  const hidElbow = side === 'left' ? IDX.rightElbow : IDX.leftElbow;
+  const visWrist = side === 'left' ? IDX.leftWrist : IDX.rightWrist;
+  const hidWrist = side === 'left' ? IDX.rightWrist : IDX.leftWrist;
+  const visKnee = side === 'left' ? IDX.leftKnee : IDX.rightKnee;
+  const hidKnee = side === 'left' ? IDX.rightKnee : IDX.leftKnee;
+
+  pose[visSh]    = makeLandmark(shoulderX,         shoulderY,         visibility);
+  pose[visHip]   = makeLandmark(hipX,              hipY,              visibility);
+  pose[visAnkle] = makeLandmark(ankleX,            ankleY,            visibility);
+  pose[visElbow] = makeLandmark(elbowX,            elbowY,            visibility);
+  pose[visWrist] = makeLandmark(wristX,            wristY,            visibility);
+  pose[visKnee]  = makeLandmark(kneeX,             kneeY,             visibility);
+
+  pose[hidSh]    = makeLandmark(shoulderX + 0.005, shoulderY + 0.005, visibility * 0.5);
+  pose[hidHip]   = makeLandmark(hipX      + 0.005, hipY      + 0.005, visibility * 0.5);
+  pose[hidAnkle] = makeLandmark(ankleX    - 0.005, ankleY    + 0.005, visibility * 0.5);
+  pose[hidElbow] = makeLandmark(elbowX    + 0.005, elbowY    + 0.005, visibility * 0.5);
+  pose[hidWrist] = makeLandmark(wristX    + 0.005, wristY    + 0.005, visibility * 0.5);
+  pose[hidKnee]  = makeLandmark(kneeX     + 0.005, kneeY     + 0.005, visibility * 0.5);
+
+  // Head / nose above shoulder (side-on)
+  pose[IDX.nose]     = makeLandmark(shoulderX - 0.05, shoulderY - 0.03, visibility);
+  pose[IDX.leftEar]  = makeLandmark(shoulderX - 0.04, shoulderY - 0.02, visibility * (side === 'left' ? 1 : 0.5));
+  pose[IDX.rightEar] = makeLandmark(shoulderX - 0.04, shoulderY - 0.02, visibility * (side === 'right' ? 1 : 0.5));
+
+  // Heel and foot (near ankle)
+  const visHeel = side === 'left' ? IDX.leftHeel : IDX.rightHeel;
+  const hidHeel = side === 'left' ? IDX.rightHeel : IDX.leftHeel;
+  const visFoot = side === 'left' ? IDX.leftFootIndex : IDX.rightFootIndex;
+  const hidFoot = side === 'left' ? IDX.rightFootIndex : IDX.leftFootIndex;
+  pose[visHeel] = makeLandmark(ankleX - 0.01, ankleY + 0.01, visibility);
+  pose[hidHeel] = makeLandmark(ankleX + 0.01, ankleY + 0.01, visibility * 0.5);
+  pose[visFoot] = makeLandmark(ankleX + 0.02, ankleY,        visibility);
+  pose[hidFoot] = makeLandmark(ankleX + 0.02, ankleY + 0.005, visibility * 0.5);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// BURPEE -- side-facing pose
+//
+// The burpee is a multi-phase exercise. The entire state machine is driven
+// by hip Y offset from a standing baseline. We synthesise the body position
+// from this single offset:
+//
+//   hipYOffset = 0      â†’ standing: vertical body
+//   hipYOffset = +0.05  â†’ squat: hips dropped, knees bent
+//   hipYOffset = +0.15  â†’ plank: body horizontal
+//   hipYOffset = -0.05  â†’ jump: body above standing baseline
+//
+// For plank and squat phases, kneeAngleDeg controls the knee geometry.
+// ------------------------------------------------------------------------
+
+export function buildBurpeePose(intent: BurpeePoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i].visibility = 0;
+    return pose;
+  }
+
+  const {
+    hipYOffset,
+    hipPlankDeviation = 0,
+    side = 'left',
+    bodyHeight = 0.62,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  // Determine phase-appropriate knee angle if not specified
+  const isPlankPhase = hipYOffset >= 0.10;
+  const isSquatPhase = hipYOffset >= 0.03 && !isPlankPhase;
+  const kneeAngleDeg = intent.kneeAngleDeg ??
+    (isPlankPhase ? 170 : isSquatPhase ? 80 : 170);
+
+  const pose = emptyPose();
+
+  if (isPlankPhase) {
+    // Horizontal plank body (similar to buildMountainClimberPose)
+    const shoulderX = 0.15;
+    const ankleX = shoulderX + bodyHeight;
+    const hipX = (shoulderX + ankleX) / 2;
+    // Compute the plank hip Y consistent with the vertical-phase baseline.
+    // The engine captures baseline from vertical pose: baseHipY = 0.88 - HIP_FRAC * span.
+    // hipYOffset is the drop FROM that baseline, so plankHipY = baseHipY + hipYOffset.
+    const vertAnkleY = 0.88;
+    const HIP_FRAC_V = 0.35; // matches vertical: 1 - HIP_FROM_SHOULDER_FRAC(0.65)
+    const actualSpanV = bodyHeight > 0.10 ? bodyHeight : 0.51;
+    const baseHipY_vert = vertAnkleY - HIP_FRAC_V * actualSpanV;
+    const plankHipY = baseHipY_vert + hipYOffset;
+    const shoulderY = plankHipY;
+    const ankleY = plankHipY;
+    const hipY = plankHipY + hipPlankDeviation;
+
+    // Knee: interpolate between hip and ankle horizontally (plank body line).
+    // For near-straight leg (170Â°), knee sits midway with tiny downward Y offset.
+    // This produces kneeExtensionDeg > 150 as required by PLANK_KNEE_THRESHOLD.
+    const kneeX = (hipX + ankleX) / 2;
+    const flexRad = ((180 - kneeAngleDeg) * Math.PI) / 180; // small for near-straight
+    const halfHorizSpan = (ankleX - hipX) / 2;
+    const kneeY = hipY + halfHorizSpan * Math.sin(flexRad * 0.5);
+
+    const wristX = shoulderX;
+    const wristY = shoulderY + 0.12;
+    const elbowX = shoulderX;
+    const elbowY = shoulderY + 0.06;
+
+    const visSh = side === 'left' ? IDX.leftShoulder : IDX.rightShoulder;
+    const hidSh = side === 'left' ? IDX.rightShoulder : IDX.leftShoulder;
+    const visHip = side === 'left' ? IDX.leftHip : IDX.rightHip;
+    const hidHip = side === 'left' ? IDX.rightHip : IDX.leftHip;
+    const visKnee = side === 'left' ? IDX.leftKnee : IDX.rightKnee;
+    const hidKnee = side === 'left' ? IDX.rightKnee : IDX.leftKnee;
+    const visAnkle = side === 'left' ? IDX.leftAnkle : IDX.rightAnkle;
+    const hidAnkle = side === 'left' ? IDX.rightAnkle : IDX.leftAnkle;
+    const visElbow = side === 'left' ? IDX.leftElbow : IDX.rightElbow;
+    const hidElbow = side === 'left' ? IDX.rightElbow : IDX.leftElbow;
+    const visWrist = side === 'left' ? IDX.leftWrist : IDX.rightWrist;
+    const hidWrist = side === 'left' ? IDX.rightWrist : IDX.leftWrist;
+
+    pose[visSh]    = makeLandmark(shoulderX,         shoulderY,         visibility);
+    pose[visHip]   = makeLandmark(hipX,              hipY,              visibility);
+    pose[visKnee]  = makeLandmark(kneeX,             kneeY,             visibility);
+    pose[visAnkle] = makeLandmark(ankleX,            ankleY,            visibility);
+    pose[visElbow] = makeLandmark(elbowX,            elbowY,            visibility);
+    pose[visWrist] = makeLandmark(wristX,            wristY,            visibility);
+
+    pose[hidSh]    = makeLandmark(shoulderX + 0.005, shoulderY + 0.005, visibility * 0.5);
+    pose[hidHip]   = makeLandmark(hipX      + 0.005, hipY      + 0.005, visibility * 0.5);
+    pose[hidKnee]  = makeLandmark(kneeX     + 0.005, kneeY     + 0.005, visibility * 0.5);
+    pose[hidAnkle] = makeLandmark(ankleX    - 0.005, ankleY    + 0.005, visibility * 0.5);
+    pose[hidElbow] = makeLandmark(elbowX    + 0.005, elbowY    + 0.005, visibility * 0.5);
+    pose[hidWrist] = makeLandmark(wristX    + 0.005, wristY    + 0.005, visibility * 0.5);
+
+    pose[IDX.nose]     = makeLandmark(shoulderX - 0.05, shoulderY - 0.03, visibility);
+    pose[IDX.leftEar]  = makeLandmark(shoulderX - 0.04, shoulderY - 0.02, visibility * (side === 'left' ? 1 : 0.5));
+    pose[IDX.rightEar] = makeLandmark(shoulderX - 0.04, shoulderY - 0.02, visibility * (side === 'right' ? 1 : 0.5));
+
+    const visHeel = side === 'left' ? IDX.leftHeel : IDX.rightHeel;
+    const hidHeel = side === 'left' ? IDX.rightHeel : IDX.leftHeel;
+    const visFoot = side === 'left' ? IDX.leftFootIndex : IDX.rightFootIndex;
+    const hidFoot = side === 'left' ? IDX.rightFootIndex : IDX.leftFootIndex;
+    pose[visHeel] = makeLandmark(ankleX - 0.01, ankleY + 0.01, visibility);
+    pose[hidHeel] = makeLandmark(ankleX + 0.01, ankleY + 0.01, visibility * 0.5);
+    pose[visFoot] = makeLandmark(ankleX + 0.02, ankleY,        visibility);
+    pose[hidFoot] = makeLandmark(ankleX + 0.02, ankleY + 0.005, visibility * 0.5);
+  } else {
+    // Vertical body (standing, squatting, rising, jumping) â€” side-facing.
+    // bodyHeight is the ankle-to-shoulder span (default 0.62 â†’ passes [0.50, 0.90]).
+    // Proportions: hip is 65% down from shoulder (= 35% up from ankle).
+    const HIP_FROM_SHOULDER_FRAC = 0.65;   // hip is 65% down from shoulder
+
+    const ankleX = 0.50;
+    const ankleY = 0.88;
+
+    const shoulderX = 0.50;
+    // Shoulder is bodyHeight above ankle
+    const baseShouderY = ankleY - bodyHeight;
+    const baseHipY = baseShouderY + HIP_FROM_SHOULDER_FRAC * bodyHeight;
+
+    const hipX = 0.50;
+    // hipYOffset adds to hip Y (positive = hips drop lower = higher Y value)
+    const hipY = baseHipY + hipYOffset;
+    const shoulderY = baseShouderY; // shoulder stays fixed
+
+    // Knee: midpoint Y, with slight forward X offset for squat bend
+    const lowerLegLen = bodyHeight * (1 - HIP_FROM_SHOULDER_FRAC); // = 35% of bodyHeight
+    const kneeRad = ((180 - kneeAngleDeg) / 2) * Math.PI / 180;
+    const kneeOffset = lowerLegLen * Math.sin(kneeRad) * 0.5;
+    const kneeX = hipX + kneeOffset;
+    const kneeY = (hipY + ankleY) / 2;
+
+    const wristX = shoulderX - 0.05;
+    const wristY = hipY + 0.04;               // arms hang at hip level
+    const elbowX = shoulderX - 0.02;
+    const elbowY = (shoulderY + wristY) / 2;
+
+    const headX = shoulderX + 0.04;
+    const headY = shoulderY - 0.08;
+
+    const visSh = side === 'left' ? IDX.leftShoulder : IDX.rightShoulder;
+    const hidSh = side === 'left' ? IDX.rightShoulder : IDX.leftShoulder;
+    const visHip = side === 'left' ? IDX.leftHip : IDX.rightHip;
+    const hidHip = side === 'left' ? IDX.rightHip : IDX.leftHip;
+    const visKnee = side === 'left' ? IDX.leftKnee : IDX.rightKnee;
+    const hidKnee = side === 'left' ? IDX.rightKnee : IDX.leftKnee;
+    const visAnkle = side === 'left' ? IDX.leftAnkle : IDX.rightAnkle;
+    const hidAnkle = side === 'left' ? IDX.rightAnkle : IDX.leftAnkle;
+    const visElbow = side === 'left' ? IDX.leftElbow : IDX.rightElbow;
+    const hidElbow = side === 'left' ? IDX.rightElbow : IDX.leftElbow;
+    const visWrist = side === 'left' ? IDX.leftWrist : IDX.rightWrist;
+    const hidWrist = side === 'left' ? IDX.rightWrist : IDX.leftWrist;
+
+    pose[visSh]    = makeLandmark(shoulderX,         shoulderY,         visibility);
+    pose[visHip]   = makeLandmark(hipX,              hipY,              visibility);
+    pose[visKnee]  = makeLandmark(kneeX,             kneeY,             visibility);
+    pose[visAnkle] = makeLandmark(ankleX,            ankleY,            visibility);
+    pose[visElbow] = makeLandmark(elbowX,            elbowY,            visibility);
+    pose[visWrist] = makeLandmark(wristX,            wristY,            visibility);
+
+    pose[hidSh]    = makeLandmark(shoulderX + 0.01,  shoulderY + 0.005, visibility * 0.5);
+    pose[hidHip]   = makeLandmark(hipX      + 0.01,  hipY      + 0.005, visibility * 0.5);
+    pose[hidKnee]  = makeLandmark(kneeX     + 0.01,  kneeY     + 0.005, visibility * 0.5);
+    pose[hidAnkle] = makeLandmark(ankleX    + 0.01,  ankleY    + 0.005, visibility * 0.5);
+    pose[hidElbow] = makeLandmark(elbowX    + 0.01,  elbowY    + 0.005, visibility * 0.5);
+    pose[hidWrist] = makeLandmark(wristX    + 0.01,  wristY    + 0.005, visibility * 0.5);
+
+    pose[IDX.nose]     = makeLandmark(headX,          headY,             visibility);
+    pose[IDX.leftEar]  = makeLandmark(headX - 0.03,   headY + 0.01,      visibility * (side === 'left' ? 1 : 0.5));
+    pose[IDX.rightEar] = makeLandmark(headX + 0.03,   headY + 0.01,      visibility * (side === 'right' ? 1 : 0.5));
+
+    const visHeel = side === 'left' ? IDX.leftHeel : IDX.rightHeel;
+    const hidHeel = side === 'left' ? IDX.rightHeel : IDX.leftHeel;
+    const visFoot = side === 'left' ? IDX.leftFootIndex : IDX.rightFootIndex;
+    const hidFoot = side === 'left' ? IDX.rightFootIndex : IDX.leftFootIndex;
+    pose[visHeel] = makeLandmark(ankleX - 0.01, ankleY + 0.01, visibility);
+    pose[hidHeel] = makeLandmark(ankleX + 0.01, ankleY + 0.01, visibility * 0.5);
+    pose[visFoot] = makeLandmark(ankleX + 0.02, ankleY,        visibility);
+    pose[hidFoot] = makeLandmark(ankleX + 0.02, ankleY + 0.005, visibility * 0.5);
+  }
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// BOX JUMP -- side-facing vertical body (standing/loading/airborne/landing)
+// ------------------------------------------------------------------------
+
+/**
+ * Synthesizes a side-facing standing pose for box jump scenarios.
+ * The hip Y position is the primary signal; kneeAngleDeg modulates the knee.
+ *
+ * Calibration baseline: hipYOffset=0, kneeAngleDeg=170 (standing upright).
+ * Loading:  hipYOffset=+0.04, kneeAngleDeg=130-140 (quarter-squat dip).
+ * Airborne: hipYOffset=-0.10, kneeAngleDeg=170 (body flying up).
+ * Landing:  hipYOffset=-0.02, kneeAngleDeg=90 (absorbing on box).
+ */
+export function buildBoxJumpPose(intent: BoxJumpPoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i].visibility = 0;
+    return pose;
+  }
+
+  const {
+    hipYOffset,
+    kneeAngleDeg = 170,
+    side = 'left',
+    bodyHeight = 0.65,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  // Segment lengths (normalised frame units)
+  // bodyHeight = shoulder-to-ankle Y span; default 0.65 â†’ 0.51 actual span
+  // To honour the bodyHeight intent, scale shoulder position from ankle up.
+  const ankleX = 0.50;
+  const baseAnkleY = 0.88;
+  const ankleY = baseAnkleY;
+
+  // Use bodyHeight to set shoulder position (enables calibration distance gate tests)
+  // Default 0.65 â†’ shoulderY = 0.88 - 0.51 = 0.37 (matches original fixed layout)
+  const DEFAULT_BH = 0.51; // original default body span
+  const actualSpan = bodyHeight > 0.10 ? bodyHeight : DEFAULT_BH;
+  const shoulderSpan = actualSpan; // shoulder-to-ankle Y distance
+
+  const TORSO_FRAC = 0.15 / (0.15 + 0.18 + 0.18); // torso / total
+  const HIP_FRAC   = (0.18 + 0.18) / (0.15 + 0.18 + 0.18); // hip above ankle / total
+
+  // Hip Y: baseline (hipYOffset=0) = ankleY - HIP_FRAC * actualSpan
+  const baseHipY = ankleY - HIP_FRAC * actualSpan;
+  const hipX = 0.50;
+  const hipY = baseHipY + hipYOffset;
+
+  // Knee: placed between hip and ankle, offset laterally to achieve knee angle
+  const kneeRad = ((180 - kneeAngleDeg) / 2) * Math.PI / 180;
+  const lowerLeg = (1 - TORSO_FRAC) * actualSpan * 0.5; // half the non-torso span
+  const kneeOffset = lowerLeg * Math.sin(kneeRad) * 0.5;
+  const kneeX = hipX + kneeOffset;
+  const kneeY = (hipY + ankleY) / 2;
+
+  // Shoulder is above hip (use span-based calculation)
+  const shoulderX = hipX;
+  const shoulderY = ankleY - shoulderSpan;
+
+  // Arms hang at hip level when standing/loading; swing forward on jump
+  const wristX = shoulderX - 0.05;
+  const wristY = hipY + 0.03;
+  const elbowX = shoulderX - 0.02;
+  const elbowY = (shoulderY + wristY) / 2;
+
+  const headX = shoulderX + 0.04;
+  const headY = shoulderY - 0.08;
+
+  const visSh    = side === 'left' ? IDX.leftShoulder  : IDX.rightShoulder;
+  const hidSh    = side === 'left' ? IDX.rightShoulder : IDX.leftShoulder;
+  const visHip   = side === 'left' ? IDX.leftHip       : IDX.rightHip;
+  const hidHip   = side === 'left' ? IDX.rightHip      : IDX.leftHip;
+  const visKnee  = side === 'left' ? IDX.leftKnee      : IDX.rightKnee;
+  const hidKnee  = side === 'left' ? IDX.rightKnee     : IDX.leftKnee;
+  const visAnkle = side === 'left' ? IDX.leftAnkle     : IDX.rightAnkle;
+  const hidAnkle = side === 'left' ? IDX.rightAnkle    : IDX.leftAnkle;
+  const visElbow = side === 'left' ? IDX.leftElbow     : IDX.rightElbow;
+  const hidElbow = side === 'left' ? IDX.rightElbow    : IDX.leftElbow;
+  const visWrist = side === 'left' ? IDX.leftWrist     : IDX.rightWrist;
+  const hidWrist = side === 'left' ? IDX.rightWrist    : IDX.leftWrist;
+
+  pose[visSh]    = makeLandmark(shoulderX,         shoulderY,         visibility);
+  pose[visHip]   = makeLandmark(hipX,              hipY,              visibility);
+  pose[visKnee]  = makeLandmark(kneeX,             kneeY,             visibility);
+  pose[visAnkle] = makeLandmark(ankleX,            ankleY,            visibility);
+  pose[visElbow] = makeLandmark(elbowX,            elbowY,            visibility);
+  pose[visWrist] = makeLandmark(wristX,            wristY,            visibility);
+
+  pose[hidSh]    = makeLandmark(shoulderX + 0.01,  shoulderY + 0.005, visibility * 0.5);
+  pose[hidHip]   = makeLandmark(hipX      + 0.01,  hipY      + 0.005, visibility * 0.5);
+  pose[hidKnee]  = makeLandmark(kneeX     + 0.01,  kneeY     + 0.005, visibility * 0.5);
+  pose[hidAnkle] = makeLandmark(ankleX    + 0.01,  ankleY    + 0.005, visibility * 0.5);
+  pose[hidElbow] = makeLandmark(elbowX    + 0.01,  elbowY    + 0.005, visibility * 0.5);
+  pose[hidWrist] = makeLandmark(wristX    + 0.01,  wristY    + 0.005, visibility * 0.5);
+
+  pose[IDX.nose]     = makeLandmark(headX,        headY,          visibility);
+  pose[IDX.leftEar]  = makeLandmark(headX - 0.03, headY + 0.01,   visibility * (side === 'left' ? 1 : 0.5));
+  pose[IDX.rightEar] = makeLandmark(headX + 0.03, headY + 0.01,   visibility * (side === 'right' ? 1 : 0.5));
+
+  const visHeel = side === 'left' ? IDX.leftHeel       : IDX.rightHeel;
+  const hidHeel = side === 'left' ? IDX.rightHeel      : IDX.leftHeel;
+  const visFoot = side === 'left' ? IDX.leftFootIndex  : IDX.rightFootIndex;
+  const hidFoot = side === 'left' ? IDX.rightFootIndex : IDX.leftFootIndex;
+  pose[visHeel] = makeLandmark(ankleX - 0.01, ankleY + 0.01,  visibility);
+  pose[hidHeel] = makeLandmark(ankleX + 0.01, ankleY + 0.01,  visibility * 0.5);
+  pose[visFoot] = makeLandmark(ankleX + 0.02, ankleY,         visibility);
+  pose[hidFoot] = makeLandmark(ankleX + 0.02, ankleY + 0.005, visibility * 0.5);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// PLANK -- side-facing pose (left side visible by default)
+// ------------------------------------------------------------------------
+
+export function buildKBSwingPose(intent: KBSwingPoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    // Invisible pose (occlusion / position-lost)
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i].visibility = 0;
+    return pose;
+  }
+  const {
+    hipHingeDeg: hingeDeg = 0,
+    extraKneeBend = 0,
+    armLift = false,
+    roundedBack = false,
+    side = 'left',
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  const ankleX = 0.50;
+  const ankleY = 0.85;
+  // Extra knee bend shifts knee forward (simulates squat-pattern)
+  const kneeX = 0.50 + extraKneeBend * 0.003;
+  const kneeY = ankleY - KB_LOWER_LEG + extraKneeBend * 0.002;
+  const hipX = 0.50;
+  const hipY = kneeY - KB_UPPER_LEG;
+
+  // Shoulder rotates around hip as hinge increases (same as deadlift)
+  const hingeRad = (hingeDeg * Math.PI) / 180;
+  const shoulderXBase = hipX + KB_TORSO * Math.sin(hingeRad);
+  const shoulderYBase = hipY - KB_TORSO * Math.cos(hingeRad);
+  // roundedBack: drop shoulder 0.08 below its natural position so torsoAngleDeg > 88Â°
+  const shoulderX = shoulderXBase;
+  const shoulderY = roundedBack ? hipY + 0.06 : shoulderYBase;
+
+  const headX = shoulderX + 0.04;
+  const headY = shoulderY - 0.08;
+
+  // Wrist placement: armLift = wrist above shoulder (arm-lift error)
+  // Normal: wrist at hip level (arms passively hanging / holding KB)
+  const wristX = shoulderX - 0.02;
+  const wristY = armLift ? shoulderY - 0.12 : hipY + 0.04;
+  const elbowX = shoulderX;
+  const elbowY = (shoulderY + wristY) / 2;
+
+  const [visSh, hidSh] = side === 'left'
+    ? [IDX.leftShoulder, IDX.rightShoulder]
+    : [IDX.rightShoulder, IDX.leftShoulder];
+  const [visHip, hidHip] = side === 'left'
+    ? [IDX.leftHip, IDX.rightHip]
+    : [IDX.rightHip, IDX.leftHip];
+  const [visKnee, hidKnee] = side === 'left'
+    ? [IDX.leftKnee, IDX.rightKnee]
+    : [IDX.rightKnee, IDX.leftKnee];
+  const [visAnkle, hidAnkle] = side === 'left'
+    ? [IDX.leftAnkle, IDX.rightAnkle]
+    : [IDX.rightAnkle, IDX.leftAnkle];
+  const [visElbow, hidElbow] = side === 'left'
+    ? [IDX.leftElbow, IDX.rightElbow]
+    : [IDX.rightElbow, IDX.leftElbow];
+  const [visWrist, hidWrist] = side === 'left'
+    ? [IDX.leftWrist, IDX.rightWrist]
+    : [IDX.rightWrist, IDX.leftWrist];
+
+  pose[visSh]    = makeLandmark(shoulderX,       shoulderY,      visibility);
+  pose[visHip]   = makeLandmark(hipX,            hipY,           visibility);
+  pose[visKnee]  = makeLandmark(kneeX,           kneeY,          visibility);
+  pose[visAnkle] = makeLandmark(ankleX,          ankleY,         visibility);
+  pose[visElbow] = makeLandmark(elbowX,          elbowY,         visibility);
+  pose[visWrist] = makeLandmark(wristX,          wristY,         visibility);
+
+  pose[hidSh]    = makeLandmark(shoulderX + 0.01, shoulderY + 0.005, visibility * 0.5);
+  pose[hidHip]   = makeLandmark(hipX      + 0.01, hipY      + 0.005, visibility * 0.5);
+  pose[hidKnee]  = makeLandmark(kneeX     + 0.01, kneeY     + 0.005, visibility * 0.5);
+  pose[hidAnkle] = makeLandmark(ankleX    + 0.01, ankleY    + 0.005, visibility * 0.5);
+  pose[hidElbow] = makeLandmark(elbowX    + 0.01, elbowY    + 0.005, visibility * 0.5);
+  pose[hidWrist] = makeLandmark(wristX    + 0.01, wristY    + 0.005, visibility * 0.5);
+
+  pose[IDX.nose]     = makeLandmark(headX,        headY,          visibility);
+  pose[IDX.leftEar]  = makeLandmark(headX - 0.03, headY + 0.01, visibility * (side === 'left' ? 1 : 0.5));
+  pose[IDX.rightEar] = makeLandmark(headX + 0.03, headY + 0.01, visibility * (side === 'right' ? 1 : 0.5));
+
+  // Side-profile calibration gate: both shoulders must have X-diff > 0.04.
+  // The 'vis' shoulder is at shoulderX; place the back shoulder 0.08 back.
+  if (side === 'left') {
+    pose[IDX.rightShoulder] = makeLandmark(shoulderX - 0.08, shoulderY + 0.01, visibility * 0.7);
+  } else {
+    pose[IDX.leftShoulder] = makeLandmark(shoulderX + 0.08, shoulderY + 0.01, visibility * 0.7);
+  }
+
+  const [visHeel, hidHeel] = side === 'left'
+    ? [IDX.leftHeel, IDX.rightHeel]
+    : [IDX.rightHeel, IDX.leftHeel];
+  const [visFoot, hidFoot] = side === 'left'
+    ? [IDX.leftFootIndex, IDX.rightFootIndex]
+    : [IDX.rightFootIndex, IDX.leftFootIndex];
+  pose[visHeel] = makeLandmark(ankleX - 0.01, ankleY + 0.01, visibility);
+  pose[hidHeel] = makeLandmark(ankleX + 0.01, ankleY + 0.01, visibility * 0.5);
+  pose[visFoot] = makeLandmark(ankleX + 0.02, ankleY,        visibility);
+  pose[hidFoot] = makeLandmark(ankleX + 0.02, ankleY + 0.005, visibility * 0.5);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// LATERAL RAISE -- front-facing standing pose
+//
+// At armAbductionDeg=0: arms at sides, wrists hang at hip level.
+// At armAbductionDeg=90: arms parallel to floor, wrists at shoulder level.
+// At armAbductionDeg > 90: above parallel (above-parallel error territory).
+//
+// Geometry for each arm:
+//   wristX = shoulderX +/- LAT_ARM_L_TOTAL * sin(thetaRad)
+//   wristY = shoulderY + LAT_ARM_L_TOTAL * cos(thetaRad)
+//
+// Where theta=0 -> arm straight down, theta=90 -> arm horizontal.
+// torsoSwingOffset shifts shoulder midpoint X (torso swing error).
+// ------------------------------------------------------------------------
+
+const LAT_ARM_L_TOTAL = 0.26; // upper arm + forearm combined in normalised coords
+
+function latRaiseArmGeom(
+  shoulderX: number,
+  shoulderY: number,
+  abductionDeg: number,
+  side: 'left' | 'right',
+) {
+  const thetaRad = (abductionDeg * Math.PI) / 180;
+  const sign = side === 'left' ? -1 : 1;
+  const wristX = shoulderX + sign * LAT_ARM_L_TOTAL * Math.sin(thetaRad);
+  const wristY = shoulderY + LAT_ARM_L_TOTAL * Math.cos(thetaRad);
+  const halfL = LAT_ARM_L_TOTAL / 2;
+  const elbowX = shoulderX + sign * halfL * Math.sin(thetaRad);
+  const elbowY = shoulderY + halfL * Math.cos(thetaRad);
+  return { wristX, wristY, elbowX, elbowY };
+}
+
+export function buildStarJumpPose(intent: StarJumpPoseIntent): PoseLandmarks {
+  const {
+    armRaiseDeg,
+    leftArmRaiseDeg,
+    rightArmRaiseDeg,
+    feetSpreadRatio = 1.0,
+    bodyHeight = 0.70,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  const cx = 0.50;
+  const baseAnkleY = 0.92;
+  const shoulderWidth = 0.16;
+  const shoulderHalf = shoulderWidth / 2;
+  const ankleHalf = (shoulderWidth * feetSpreadRatio) / 2;
+  const ankleXLeft  = cx - ankleHalf;
+  const ankleXRight = cx + ankleHalf;
+  const ankleYsj = baseAnkleY;
+
+  const hipMidX    = cx;
+  const hipMidY    = baseAnkleY - 0.40;
+  const shoulderMidX = cx;
+  const shoulderMidY = hipMidY - 0.18;
+  const headY = shoulderMidY - 0.10;
+  const hipHalf = 0.06;
+
+  pose[IDX.nose]     = makeLandmark(shoulderMidX,         headY,        visibility);
+  pose[IDX.leftEye]  = makeLandmark(shoulderMidX - 0.02,  headY - 0.01, visibility);
+  pose[IDX.rightEye] = makeLandmark(shoulderMidX + 0.02,  headY - 0.01, visibility);
+  pose[IDX.leftEar]  = makeLandmark(shoulderMidX - 0.035, headY,        visibility);
+  pose[IDX.rightEar] = makeLandmark(shoulderMidX + 0.035, headY,        visibility);
+
+  const leftShoulderX  = shoulderMidX - shoulderHalf;
+  const rightShoulderX = shoulderMidX + shoulderHalf;
+  pose[IDX.leftShoulder]  = makeLandmark(leftShoulderX,  shoulderMidY, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(rightShoulderX, shoulderMidY, visibility);
+  pose[IDX.leftHip]  = makeLandmark(hipMidX - hipHalf, hipMidY, visibility);
+  pose[IDX.rightHip] = makeLandmark(hipMidX + hipHalf, hipMidY, visibility);
+
+  const leftRaise  = leftArmRaiseDeg  ?? armRaiseDeg;
+  const rightRaise = rightArmRaiseDeg ?? armRaiseDeg;
+  const sjLeftArm  = starJumpArmGeom(leftShoulderX,  shoulderMidY, leftRaise,  'left');
+  const sjRightArm = starJumpArmGeom(rightShoulderX, shoulderMidY, rightRaise, 'right');
+
+  pose[IDX.leftElbow]  = makeLandmark(sjLeftArm.elbowX,  sjLeftArm.elbowY,  visibility);
+  pose[IDX.rightElbow] = makeLandmark(sjRightArm.elbowX, sjRightArm.elbowY, visibility);
+  pose[IDX.leftWrist]  = makeLandmark(sjLeftArm.wristX,  sjLeftArm.wristY,  visibility);
+  pose[IDX.rightWrist] = makeLandmark(sjRightArm.wristX, sjRightArm.wristY, visibility);
+
+  const kneeYsj = (hipMidY + ankleYsj) / 2;
+  pose[IDX.leftKnee]  = makeLandmark(ankleXLeft,  kneeYsj, visibility);
+  pose[IDX.rightKnee] = makeLandmark(ankleXRight, kneeYsj, visibility);
+  pose[IDX.leftAnkle]  = makeLandmark(ankleXLeft,  ankleYsj, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(ankleXRight, ankleYsj, visibility);
+  pose[IDX.leftHeel]   = makeLandmark(ankleXLeft  - 0.005, ankleYsj + 0.01, visibility);
+  pose[IDX.rightHeel]  = makeLandmark(ankleXRight + 0.005, ankleYsj + 0.01, visibility);
+  pose[IDX.leftFootIndex]  = makeLandmark(ankleXLeft  + 0.02, ankleYsj, visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(ankleXRight - 0.02, ankleYsj, visibility);
+
+  void bodyHeight;
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// GLUTE BRIDGE -- side-facing lying-down pose (user on back, knees bent).
+//
+// The user lies horizontally with the camera at their side.
+// At rest (hipRise=0): hips at floor level (y=0.8425).
+// At full bridge (hipRise=1): hips raised by kneeAboveHipY â‰ˆ 0.2675.
+//
+// Calibration geometry (hipRise=0):
+//   shoulderMid: xâ‰ˆ0.225, y=0.76
+//   hipMid:      xâ‰ˆ0.50,  y=0.8425  â†’ restingHipY
+//   kneeMid:     xâ‰ˆ0.57,  y=0.5725  â†’ kneeAboveHipY = 0.2700
+//   ankleMid:    xâ‰ˆ0.65,  y=0.8425
+//
+// Both sides are made fully visible (in a lying-down position MediaPipe
+// can track both left and right landmarks simultaneously).
+// ------------------------------------------------------------------------
+
+const GB_KABY = 0.2675; // kneeAboveHipY: hipMid.y(0.8425) - kneeMid.y(0.5725)
+
+export function buildGluteBridgePose(intent: GluteBridgePoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i].visibility = 0;
+    return pose;
+  }
+
+  const {
+    hipRise,
+    kneeBentOverride = false,
+    hipsUpAtRest = false,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  // Floor Y for hips / ankles
+  const HIP_REST_Y = 0.8425;
+  const ANKLE_Y    = 0.8425;
+  const SHOULDER_Y = 0.76;    // shoulders stay on floor
+  const KNEE_Y     = 0.5725;  // knees raised throughout
+
+  // Hip Y rises by hipRise * GB_KABY (y decreases = upward)
+  const currentHipY = HIP_REST_Y - hipRise * GB_KABY;
+
+  // Override gates for calibration failure tests
+  const actualHipY   = hipsUpAtRest ? HIP_REST_Y - 0.20 : currentHipY;
+  const actualKneeY  = kneeBentOverride ? HIP_REST_Y + 0.02 : KNEE_Y;
+
+  // Left side (primary, slightly left of centre)
+  pose[IDX.leftShoulder] = makeLandmark(0.220, SHOULDER_Y,  visibility);
+  pose[IDX.leftHip]      = makeLandmark(0.490, actualHipY,  visibility);
+  pose[IDX.leftKnee]     = makeLandmark(0.560, actualKneeY, visibility);
+  pose[IDX.leftAnkle]    = makeLandmark(0.640, ANKLE_Y,     visibility);
+  pose[IDX.leftWrist]    = makeLandmark(0.240, SHOULDER_Y + 0.04, visibility);
+  pose[IDX.leftElbow]    = makeLandmark(0.300, SHOULDER_Y + 0.02, visibility);
+
+  // Right side (slightly right of centre, same visibility â€” lying down)
+  pose[IDX.rightShoulder] = makeLandmark(0.230, SHOULDER_Y  + 0.005, visibility);
+  pose[IDX.rightHip]      = makeLandmark(0.510, actualHipY  + 0.005, visibility);
+  pose[IDX.rightKnee]     = makeLandmark(0.580, actualKneeY + 0.005, visibility);
+  pose[IDX.rightAnkle]    = makeLandmark(0.660, ANKLE_Y     + 0.005, visibility);
+  pose[IDX.rightWrist]    = makeLandmark(0.240, SHOULDER_Y + 0.045,  visibility);
+  pose[IDX.rightElbow]    = makeLandmark(0.300, SHOULDER_Y + 0.025,  visibility);
+
+  // Head landmarks (above/near shoulder, side-on)
+  pose[IDX.nose]     = makeLandmark(0.170, SHOULDER_Y - 0.03, visibility);
+  pose[IDX.leftEar]  = makeLandmark(0.180, SHOULDER_Y - 0.02, visibility);
+  pose[IDX.rightEar] = makeLandmark(0.190, SHOULDER_Y - 0.015, visibility * 0.7);
+
+  // Heel / foot (near ankle)
+  pose[IDX.leftHeel]       = makeLandmark(0.630, ANKLE_Y + 0.01,  visibility);
+  pose[IDX.rightHeel]      = makeLandmark(0.650, ANKLE_Y + 0.012, visibility);
+  pose[IDX.leftFootIndex]  = makeLandmark(0.655, ANKLE_Y,         visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(0.675, ANKLE_Y + 0.005, visibility);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// OVERHEAD TRICEP EXTENSION -- front-facing, arms overhead
+//
+// Geometry:
+//   shoulderY = 0.35  (at ~35% down the frame)
+//   elbowY    = shoulderY - UPPER_ARM_L  (elbow is ABOVE shoulder: smaller y)
+//   wristY    = elbowY    - UPPER_ARM_L * extensionLevel
+//
+//   extensionLevel=1.0 â†’ wrist is one full upper-arm-length above elbow (extended)
+//   extensionLevel=0.0 â†’ wrist is at elbow level (forearms horizontal)
+//
+// The engine's tricepExtDeg = (elbow.y - wrist.y) / upperArmLen Ã— 90
+//   = extensionLevel Ã— 90
+// So at extensionLevel=1.0: tricepExtDegâ‰ˆ90Â° (extended)
+//    at extensionLevel=0.0: tricepExtDegâ‰ˆ0Â°  (bottom)
+// ------------------------------------------------------------------------
+
+const OTE_UPPER_ARM_L = 0.13;
+const OTE_FOREARM_L   = 0.13;
+
+export function buildOTEPose(intent: OTEPoseIntent): PoseLandmarks {
+  const {
+    extensionLevel,
+    leftExtensionLevel,
+    rightExtensionLevel,
+    elbowFlareX = 0,
+    torsoSwayX = 0,
+    feetWidthRatio = 1.0,
+    bodyHeight = 0.58,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  const cx = 0.50 + torsoSwayX;
+  const baseAnkleY = 0.92;
+  const shoulderWidth = 0.16;
+  const shoulderHalf = shoulderWidth / 2;
+  const ankleHalf = (shoulderWidth * feetWidthRatio) / 2;
+  const ankleXLeft  = (cx - torsoSwayX) - ankleHalf;
+  const ankleXRight = (cx - torsoSwayX) + ankleHalf;
+  const ankleY = baseAnkleY;
+
+  // bodyHeight = shoulder-to-ankle span (default 0.58 â‰ˆ natural standing span).
+  // Used by calibration distance gate: BODY_HEIGHT_MIN=0.45, BODY_HEIGHT_MAX=0.92.
+  const shoulderMidY = ankleY - bodyHeight;
+  const shoulderMidX = cx;
+  const hipMidX   = cx;
+  const hipMidY   = shoulderMidY + 0.18;
+  const headY = shoulderMidY - 0.10;
+  const hipHalf = 0.06;
+
+  pose[IDX.nose]      = makeLandmark(shoulderMidX, headY, visibility);
+  pose[IDX.leftEye]   = makeLandmark(shoulderMidX - 0.02, headY - 0.01, visibility);
+  pose[IDX.rightEye]  = makeLandmark(shoulderMidX + 0.02, headY - 0.01, visibility);
+  pose[IDX.leftEar]   = makeLandmark(shoulderMidX - 0.035, headY, visibility);
+  pose[IDX.rightEar]  = makeLandmark(shoulderMidX + 0.035, headY, visibility);
+
+  const leftShoulderX  = shoulderMidX - shoulderHalf;
+  const rightShoulderX = shoulderMidX + shoulderHalf;
+  pose[IDX.leftShoulder]  = makeLandmark(leftShoulderX,  shoulderMidY, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(rightShoulderX, shoulderMidY, visibility);
+  pose[IDX.leftHip]  = makeLandmark(hipMidX - hipHalf, hipMidY, visibility);
+  pose[IDX.rightHip] = makeLandmark(hipMidX + hipHalf, hipMidY, visibility);
+
+  // Elbows sit directly above the shoulders (overhead position).
+  // elbowFlareX moves them outward from the shoulder x-position.
+  const leftElbowX  = leftShoulderX  - elbowFlareX;
+  const rightElbowX = rightShoulderX + elbowFlareX;
+  const elbowY      = shoulderMidY - OTE_UPPER_ARM_L;  // above shoulder
+
+  const leftExt  = leftExtensionLevel  ?? extensionLevel;
+  const rightExt = rightExtensionLevel ?? extensionLevel;
+
+  // Wrist: above or at elbow depending on extension level.
+  // wristY decreases (moves up in frame) as extensionLevel increases.
+  const leftWristY  = elbowY - OTE_FOREARM_L * leftExt;
+  const rightWristY = elbowY - OTE_FOREARM_L * rightExt;
+
+  pose[IDX.leftElbow]  = makeLandmark(leftElbowX,  elbowY, visibility);
+  pose[IDX.rightElbow] = makeLandmark(rightElbowX, elbowY, visibility);
+  pose[IDX.leftWrist]  = makeLandmark(leftElbowX,  leftWristY,  visibility);
+  pose[IDX.rightWrist] = makeLandmark(rightElbowX, rightWristY, visibility);
+
+  const kneeY = (hipMidY + ankleY) / 2;
+  pose[IDX.leftKnee]  = makeLandmark(ankleXLeft,  kneeY, visibility);
+  pose[IDX.rightKnee] = makeLandmark(ankleXRight, kneeY, visibility);
+  pose[IDX.leftAnkle]  = makeLandmark(ankleXLeft,  ankleY, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(ankleXRight, ankleY, visibility);
+  pose[IDX.leftHeel]   = makeLandmark(ankleXLeft  - 0.005, ankleY + 0.01, visibility);
+  pose[IDX.rightHeel]  = makeLandmark(ankleXRight + 0.005, ankleY + 0.01, visibility);
+  pose[IDX.leftFootIndex]  = makeLandmark(ankleXLeft  + 0.02, ankleY, visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(ankleXRight - 0.02, ankleY, visibility);
+
+  void bodyHeight;
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// BROAD JUMP -- front-facing, bilateral hip Y tracking
+// Uses same isoceles-triangle geometry as squat for correct kneeFlexionDeg round-trip.
+// hipYOffset shifts the hip (and knee) upward/downward while ankles remain fixed.
+// ------------------------------------------------------------------------
+
+export function buildBroadJumpPose(intent: BroadJumpPoseIntent): PoseLandmarks {
+  const {
+    hipYOffset = 0,
+    kneeFlexionDeg: kneeFlex = 5,
+    bodyHeight = 0.70,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+  const vis = visibility;
+
+  const centerX = 0.50;
+  const shoulderW = 0.10;
+  const feetW = 0.085;  // â‰ˆ85% of shoulder width â€” jump stance
+
+  // Shoulder pinned at shoulderY=0.15 (constant).
+  // ankleBase = shoulderY + bodyHeight â†’ |ankleBase - shoulderY| == bodyHeight.
+  // This makes the calibration distance gate trigger at the correct bodyHeight values.
+  const shoulderY = 0.15;
+  const ankleBase = shoulderY + bodyHeight;
+
+  // Hip base Y: calibration posture (kneeFlex=5 isoceles, hipYOffset=0).
+  // seg=0.22, baseLen(5Â°) â‰ˆ 0.43958. Hip directly above ankle in isoceles model.
+  const seg = 0.22;
+  const calBaseLen = 2 * seg * Math.cos((5 / 2) * Math.PI / 180);  // â‰ˆ 0.43958
+  const hipBaseY = ankleBase - calBaseLen;
+
+  // Hip position depends ONLY on hipYOffset (not kneeFlex).
+  // This guarantees hipDisp = rawHipY - baseline.hipY == hipYOffset exactly.
+  const hipY = hipBaseY + hipYOffset;
+
+  // Ankle stays fixed at the ground reference.
+  const ankleY = ankleBase;
+
+  // Knee: positioned to produce kneeFlex angle using the dynamic hip-ankle distance.
+  // Formula: place knee at midpoint between hip and ankle (in Y), then swing
+  // laterally by D/2 * tan(kneeFlex/2) where D = hip-ankle Y distance.
+  // This preserves kneeFlexionDeg == kneeFlex regardless of hipYOffset.
+  const D = Math.abs(ankleY - hipY);
+  const kneeBaseY = (hipY + ankleY) / 2;
+  const kneeLateral = D > 0
+    ? (D / 2) * Math.tan((kneeFlex / 2) * Math.PI / 180)
+    : 0;
+
+  const hipXL = centerX - feetW;   // left ankle/hip X
+  const hipXR = centerX + feetW;   // right ankle/hip X
+  const lkX = hipXL - kneeLateral;  // left knee swings left
+  const rkX = hipXR + kneeLateral;  // right knee swings right
+
+  pose[IDX.leftShoulder] = makeLandmark(centerX - shoulderW, shoulderY, vis);
+  pose[IDX.rightShoulder] = makeLandmark(centerX + shoulderW, shoulderY, vis);
+  pose[IDX.leftElbow] = makeLandmark(centerX - shoulderW - 0.06, shoulderY + 0.09, vis);
+  pose[IDX.rightElbow] = makeLandmark(centerX + shoulderW + 0.06, shoulderY + 0.09, vis);
+  pose[IDX.leftWrist] = makeLandmark(centerX - shoulderW - 0.06, shoulderY + 0.21, vis);
+  pose[IDX.rightWrist] = makeLandmark(centerX + shoulderW + 0.06, shoulderY + 0.21, vis);
+
+  pose[IDX.leftHip] = makeLandmark(hipXL, hipY, vis);
+  pose[IDX.rightHip] = makeLandmark(hipXR, hipY, vis);
+
+  pose[IDX.leftKnee] = makeLandmark(lkX, kneeBaseY, vis);
+  pose[IDX.rightKnee] = makeLandmark(rkX, kneeBaseY, vis);
+
+  pose[IDX.leftAnkle] = makeLandmark(hipXL, ankleY, vis);
+  pose[IDX.rightAnkle] = makeLandmark(hipXR, ankleY, vis);
+  pose[IDX.leftHeel] = makeLandmark(hipXL, ankleY + 0.02, vis);
+  pose[IDX.rightHeel] = makeLandmark(hipXR, ankleY + 0.02, vis);
+  pose[IDX.leftFootIndex] = makeLandmark(hipXL + 0.02, ankleY + 0.03, vis);
+  pose[IDX.rightFootIndex] = makeLandmark(hipXR - 0.02, ankleY + 0.03, vis);
+
+  const noseY = shoulderY - 0.07;
+  pose[IDX.nose] = makeLandmark(centerX, noseY, vis);
+  pose[IDX.leftEye] = makeLandmark(centerX - 0.02, noseY - 0.01, vis);
+  pose[IDX.rightEye] = makeLandmark(centerX + 0.02, noseY - 0.01, vis);
+  pose[IDX.leftEar] = makeLandmark(centerX - 0.04, noseY, vis);
+  pose[IDX.rightEar] = makeLandmark(centerX + 0.04, noseY, vis);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// DEAD BUG -- side-facing supine pose (user lies on back, camera to side).
+//
+// Geometry (side-camera, head at left, feet at right):
+//   Floor Y: 0.76 (higher y = floor level in screen coords)
+//   bodyLengthX controls the ankle x-span: ankle.x_rest = shoulder.x + bodyLengthX
+//   This is what the calibration distance gate measures (ankle.x âˆ’ shoulder.x).
+//   REST (legExtensionDeg=0, default bodyLengthX=0.55):
+//     shoulder: (0.20, 0.76)  hip: (0.50, 0.76)
+//     knee: (0.50, 0.54)      ankle: (0.75, 0.54)  [tabletop â€” knee above hip, shin horizontal]
+//   EXTENDED (t=1): knee: (0.65, 0.72)  ankle: (0.85, 0.76) â†’ hip-knee-ankle â‰ˆ 154Â°
+//   t = legExtensionDeg / 60 (linear interpolation for active leg)
+// ------------------------------------------------------------------------
+
+export function buildDeadBugPose(intent: DeadBugPoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i].visibility = 0;
+    return pose;
+  }
+
+  const {
+    legExtensionDeg,
+    activeLeg = 'left',
+    hipLiftAmount = 0,
+    armsUp = true,
+    bodyLengthX = 0.55,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  const FLOOR_Y    = 0.76;
+  const SHOULDER_X = 0.20;
+
+  // All x-positions scale with bodyLengthX so the calibration distance gate
+  // (ankle.x âˆ’ shoulder.x) equals bodyLengthX exactly.
+  const scale  = bodyLengthX / 0.55;
+  const HIP_X  = SHOULDER_X + 0.30 * scale;   // 0.50 at default
+
+  // Hip lift: positive = hips rising off floor (y decreases in screen coords)
+  const hipY = FLOOR_Y - hipLiftAmount;
+
+  // Active leg â€” interpolated from tabletop (t=0) to extended (t=1)
+  const t = Math.min(1, Math.max(0, legExtensionDeg / 60));
+  const ankleRestX = SHOULDER_X + bodyLengthX;              // 0.75 at default
+  const ankleFarX  = SHOULDER_X + bodyLengthX + 0.10 * scale; // 0.85 at default
+  const kneeFarX   = SHOULDER_X + 0.45 * scale;             // 0.65 at default
+
+  const activeKneeX  = HIP_X      + t * (kneeFarX  - HIP_X);
+  const activeKneeY  = 0.54       + t * (0.72 - 0.54);
+  const activeAnkleX = ankleRestX + t * (ankleFarX - ankleRestX);
+  const activeAnkleY = 0.54       + t * (0.76 - 0.54);
+
+  // Inactive leg â€” always at tabletop
+  const inactiveKneeX  = HIP_X;
+  const inactiveKneeY  = 0.54;
+  const inactiveAnkleX = ankleRestX;
+  const inactiveAnkleY = 0.54;
+
+  // Arms: up (wrist above shoulder) or at sides
+  const wristY = armsUp ? FLOOR_Y - 0.31 : FLOOR_Y + 0.04;
+  const elbowY = armsUp ? FLOOR_Y - 0.16 : FLOOR_Y + 0.02;
+
+  // Left side
+  pose[IDX.leftShoulder] = makeLandmark(SHOULDER_X,  FLOOR_Y, visibility);
+  pose[IDX.leftHip]      = makeLandmark(HIP_X,       hipY,    visibility);
+  pose[IDX.leftElbow]    = makeLandmark(SHOULDER_X,  elbowY,  visibility);
+  pose[IDX.leftWrist]    = makeLandmark(SHOULDER_X,  wristY,  visibility);
+
+  if (activeLeg === 'left') {
+    pose[IDX.leftKnee]  = makeLandmark(activeKneeX,  activeKneeY,  visibility);
+    pose[IDX.leftAnkle] = makeLandmark(activeAnkleX, activeAnkleY, visibility);
+  } else {
+    pose[IDX.leftKnee]  = makeLandmark(inactiveKneeX,  inactiveKneeY,  visibility);
+    pose[IDX.leftAnkle] = makeLandmark(inactiveAnkleX, inactiveAnkleY, visibility);
+  }
+
+  // Right side (slight offset to differentiate)
+  pose[IDX.rightShoulder] = makeLandmark(SHOULDER_X + 0.005, FLOOR_Y + 0.005, visibility);
+  pose[IDX.rightHip]      = makeLandmark(HIP_X      + 0.005, hipY    + 0.005, visibility);
+  pose[IDX.rightElbow]    = makeLandmark(SHOULDER_X + 0.005, elbowY  + 0.005, visibility);
+  pose[IDX.rightWrist]    = makeLandmark(SHOULDER_X + 0.005, wristY  + 0.005, visibility);
+
+  if (activeLeg === 'right') {
+    pose[IDX.rightKnee]  = makeLandmark(activeKneeX  + 0.005, activeKneeY  + 0.005, visibility);
+    pose[IDX.rightAnkle] = makeLandmark(activeAnkleX + 0.005, activeAnkleY + 0.005, visibility);
+  } else {
+    pose[IDX.rightKnee]  = makeLandmark(inactiveKneeX  + 0.005, inactiveKneeY  + 0.005, visibility);
+    pose[IDX.rightAnkle] = makeLandmark(inactiveAnkleX + 0.005, inactiveAnkleY + 0.005, visibility);
+  }
+
+  // Head / nose (at left end of body, near shoulder)
+  pose[IDX.nose]     = makeLandmark(SHOULDER_X - 0.04, FLOOR_Y - 0.04, visibility);
+  pose[IDX.leftEar]  = makeLandmark(SHOULDER_X - 0.03, FLOOR_Y - 0.02, visibility);
+  pose[IDX.rightEar] = makeLandmark(SHOULDER_X - 0.02, FLOOR_Y - 0.015, visibility * 0.7);
+
+  // Heels / foot index (near ankles)
+  pose[IDX.leftHeel]       = makeLandmark(pose[IDX.leftAnkle].x  - 0.01, pose[IDX.leftAnkle].y  + 0.01, visibility);
+  pose[IDX.rightHeel]      = makeLandmark(pose[IDX.rightAnkle].x + 0.01, pose[IDX.rightAnkle].y + 0.01, visibility);
+  pose[IDX.leftFootIndex]  = makeLandmark(pose[IDX.leftAnkle].x  + 0.02, pose[IDX.leftAnkle].y,         visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(pose[IDX.rightAnkle].x + 0.02, pose[IDX.rightAnkle].y,        visibility);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// INCHWORM -- side-facing standing pose, primary metric = hip hinge.
+//
+// Geometry is identical to buildDeadliftPose: the inchworm forward-fold is
+// a pure hip-hinge movement. Legs stay nearly straight throughout.
+// Arms hang below the shoulder when upright (armsAtSides=true, calibration).
+// ------------------------------------------------------------------------
+
+export function buildInchwormPose(intent: InchwormPoseIntent): PoseLandmarks {
+  const {
+    hipHingeDeg: hingeDeg = 0,
+    armsAtSides = true,
+    side = 'left',
+    bodyHeight = 0.62,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const LOWER_LEG = 0.22;
+  const UPPER_LEG = 0.18;
+  const TORSO     = Math.max(0.05, bodyHeight - LOWER_LEG - UPPER_LEG);
+
+  const poseOut = emptyPose();
+
+  const ankleX = 0.50;
+  const ankleY = 0.85;
+  const kneeX  = 0.50;
+  const kneeY  = ankleY - LOWER_LEG;
+  const hipX   = 0.50;
+  const hipY   = kneeY - UPPER_LEG;
+
+  const hingeRad  = (hingeDeg * Math.PI) / 180;
+  const shoulderX = hipX + TORSO * Math.sin(hingeRad);
+  const shoulderY = hipY - TORSO * Math.cos(hingeRad);
+
+  const headX = shoulderX + 0.04;
+  const headY = shoulderY - 0.08;
+
+  const wristX  = shoulderX - 0.02;
+  const wristY  = armsAtSides ? hipY + 0.04 : shoulderY - 0.15;
+  const elbowX  = shoulderX;
+  const elbowY  = (shoulderY + wristY) / 2;
+
+  const [visSh, hidSh] = side === 'left'
+    ? [IDX.leftShoulder, IDX.rightShoulder]
+    : [IDX.rightShoulder, IDX.leftShoulder];
+  const [visHip, hidHip] = side === 'left'
+    ? [IDX.leftHip, IDX.rightHip]
+    : [IDX.rightHip, IDX.leftHip];
+  const [visKnee, hidKnee] = side === 'left'
+    ? [IDX.leftKnee, IDX.rightKnee]
+    : [IDX.rightKnee, IDX.leftKnee];
+  const [visAnkle, hidAnkle] = side === 'left'
+    ? [IDX.leftAnkle, IDX.rightAnkle]
+    : [IDX.rightAnkle, IDX.leftAnkle];
+  const [visElbow, hidElbow] = side === 'left'
+    ? [IDX.leftElbow, IDX.rightElbow]
+    : [IDX.rightElbow, IDX.leftElbow];
+  const [visWrist, hidWrist] = side === 'left'
+    ? [IDX.leftWrist, IDX.rightWrist]
+    : [IDX.rightWrist, IDX.leftWrist];
+
+  poseOut[visSh]    = makeLandmark(shoulderX,        shoulderY,        visibility);
+  poseOut[visHip]   = makeLandmark(hipX,              hipY,             visibility);
+  poseOut[visKnee]  = makeLandmark(kneeX,             kneeY,            visibility);
+  poseOut[visAnkle] = makeLandmark(ankleX,            ankleY,           visibility);
+  poseOut[visElbow] = makeLandmark(elbowX,            elbowY,           visibility);
+  poseOut[visWrist] = makeLandmark(wristX,            wristY,           visibility);
+
+  poseOut[hidSh]    = makeLandmark(shoulderX + 0.01,  shoulderY + 0.005, visibility * 0.5);
+  poseOut[hidHip]   = makeLandmark(hipX      + 0.01,  hipY      + 0.005, visibility * 0.5);
+  poseOut[hidKnee]  = makeLandmark(kneeX     + 0.01,  kneeY     + 0.005, visibility * 0.5);
+  poseOut[hidAnkle] = makeLandmark(ankleX    + 0.01,  ankleY    + 0.005, visibility * 0.5);
+  poseOut[hidElbow] = makeLandmark(elbowX    + 0.01,  elbowY    + 0.005, visibility * 0.5);
+  poseOut[hidWrist] = makeLandmark(wristX    + 0.01,  wristY    + 0.005, visibility * 0.5);
+
+  poseOut[IDX.nose]     = makeLandmark(headX,         headY,           visibility);
+  poseOut[IDX.leftEar]  = makeLandmark(headX - 0.03,  headY + 0.01,   visibility * (side === 'left' ? 1 : 0.5));
+  poseOut[IDX.rightEar] = makeLandmark(headX + 0.03,  headY + 0.01,   visibility * (side === 'right' ? 1 : 0.5));
+
+  const [visHeel2, hidHeel2] = side === 'left'
+    ? [IDX.leftHeel, IDX.rightHeel]
+    : [IDX.rightHeel, IDX.leftHeel];
+  const [visFoot2, hidFoot2] = side === 'left'
+    ? [IDX.leftFootIndex, IDX.rightFootIndex]
+    : [IDX.rightFootIndex, IDX.leftFootIndex];
+  poseOut[visHeel2] = makeLandmark(ankleX - 0.01, ankleY + 0.01, visibility);
+  poseOut[hidHeel2] = makeLandmark(ankleX + 0.01, ankleY + 0.01, visibility * 0.5);
+  poseOut[visFoot2] = makeLandmark(ankleX + 0.02, ankleY,         visibility);
+  poseOut[hidFoot2] = makeLandmark(ankleX + 0.02, ankleY + 0.005, visibility * 0.5);
+
+  applyNoise(poseOut, noise, seed);
+  applyOcclusion(poseOut, occludedIndices);
+  return poseOut;
+}
+
+// ------------------------------------------------------------------------
+// JUMP SQUAT -- front-facing, bilateral hip Y tracking
+// Uses same isoceles-triangle geometry as squat for correct kneeFlexionDeg round-trip.
+// hipYOffset shifts the hip (and knee) upward/downward while ankles remain fixed.
+// ------------------------------------------------------------------------
+
+export function buildJumpSquatPose(intent: JumpSquatPoseIntent): PoseLandmarks {
+  const {
+    hipYOffset = 0,
+    kneeFlexionDeg: kneeFlex = 5,
+    bodyHeight = 0.70,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+  const vis = visibility;
+
+  const centerX = 0.50;
+  const shoulderW = 0.10;
+  const feetW = 0.085;  // â‰ˆ85% of shoulder width â€” jump stance
+
+  // Shoulder pinned at shoulderY=0.15 (constant).
+  // ankleBase = shoulderY + bodyHeight â†’ |ankleBase - shoulderY| == bodyHeight.
+  // This makes the calibration distance gate trigger at the correct bodyHeight values.
+  const shoulderY = 0.15;
+  const ankleBase = shoulderY + bodyHeight;
+
+  // Hip base Y: calibration posture (kneeFlex=5 isoceles, hipYOffset=0).
+  // seg=0.22, baseLen(5Â°) â‰ˆ 0.43958. Hip directly above ankle in isoceles model.
+  const seg = 0.22;
+  const calBaseLen = 2 * seg * Math.cos((5 / 2) * Math.PI / 180);  // â‰ˆ 0.43958
+  const hipBaseY = ankleBase - calBaseLen;
+
+  // Hip position depends ONLY on hipYOffset (not kneeFlex).
+  // This guarantees hipDisp = rawHipY - baseline.hipY == hipYOffset exactly.
+  const hipY = hipBaseY + hipYOffset;
+
+  // Ankle stays fixed at the ground reference.
+  const ankleY = ankleBase;
+
+  // Knee: positioned to produce kneeFlex angle using the dynamic hip-ankle distance.
+  // Formula: place knee at midpoint between hip and ankle (in Y), then swing
+  // laterally by D/2 * tan(kneeFlex/2) where D = hip-ankle Y distance.
+  // This preserves kneeFlexionDeg == kneeFlex regardless of hipYOffset.
+  const D = Math.abs(ankleY - hipY);
+  const kneeBaseY = (hipY + ankleY) / 2;
+  const kneeLateral = D > 0
+    ? (D / 2) * Math.tan((kneeFlex / 2) * Math.PI / 180)
+    : 0;
+
+  const hipXL = centerX - feetW;   // left ankle/hip X
+  const hipXR = centerX + feetW;   // right ankle/hip X
+  const lkX = hipXL - kneeLateral;  // left knee swings left
+  const rkX = hipXR + kneeLateral;  // right knee swings right
+
+  pose[IDX.leftShoulder] = makeLandmark(centerX - shoulderW, shoulderY, vis);
+  pose[IDX.rightShoulder] = makeLandmark(centerX + shoulderW, shoulderY, vis);
+  pose[IDX.leftElbow] = makeLandmark(centerX - shoulderW - 0.06, shoulderY + 0.09, vis);
+  pose[IDX.rightElbow] = makeLandmark(centerX + shoulderW + 0.06, shoulderY + 0.09, vis);
+  pose[IDX.leftWrist] = makeLandmark(centerX - shoulderW - 0.06, shoulderY + 0.21, vis);
+  pose[IDX.rightWrist] = makeLandmark(centerX + shoulderW + 0.06, shoulderY + 0.21, vis);
+
+  pose[IDX.leftHip] = makeLandmark(hipXL, hipY, vis);
+  pose[IDX.rightHip] = makeLandmark(hipXR, hipY, vis);
+
+  pose[IDX.leftKnee] = makeLandmark(lkX, kneeBaseY, vis);
+  pose[IDX.rightKnee] = makeLandmark(rkX, kneeBaseY, vis);
+
+  pose[IDX.leftAnkle] = makeLandmark(hipXL, ankleY, vis);
+  pose[IDX.rightAnkle] = makeLandmark(hipXR, ankleY, vis);
+  pose[IDX.leftHeel] = makeLandmark(hipXL, ankleY + 0.02, vis);
+  pose[IDX.rightHeel] = makeLandmark(hipXR, ankleY + 0.02, vis);
+  pose[IDX.leftFootIndex] = makeLandmark(hipXL + 0.02, ankleY + 0.03, vis);
+  pose[IDX.rightFootIndex] = makeLandmark(hipXR - 0.02, ankleY + 0.03, vis);
+
+  const noseY = shoulderY - 0.07;
+  pose[IDX.nose] = makeLandmark(centerX, noseY, vis);
+  pose[IDX.leftEye] = makeLandmark(centerX - 0.02, noseY - 0.01, vis);
+  pose[IDX.rightEye] = makeLandmark(centerX + 0.02, noseY - 0.01, vis);
+  pose[IDX.leftEar] = makeLandmark(centerX - 0.04, noseY, vis);
+  pose[IDX.rightEar] = makeLandmark(centerX + 0.04, noseY, vis);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// SUPERMAN -- side-facing prone pose (face-down), shoulder elevation tracking.
+//
+// Geometry:
+//   REST:   shoulder=(SHOULDER_X, FLOOR_Y), hip=(HIP_X, FLOOR_Y),
+//           knee=(KNEE_X, FLOOR_Y), ankle=(ANKLE_X, FLOOR_Y)
+//   AT_TOP: shoulderY = FLOOR_Y - shoulderRise (chest lifts off floor)
+//           legs also rise slightly (ankleY = FLOOR_Y - shoulderRise * 0.5)
+//
+// Arms extend forward (wrist.x < shoulder.x - ARMS_FORWARD_OFFSET=0.06).
+// shoulderRise=0 â†’ calibration (prone at rest).
+// shoulderRise=0.08 â†’ above AT_TOP_THRESHOLD=0.06 â†’ full valid rep.
+// ------------------------------------------------------------------------
+
+export function buildSupermanPose(intent: SupermanPoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i].visibility = 0;
+    return pose;
+  }
+
+  const {
+    shoulderRise,
+    hipLiftOff = 0,
+    armsForward = true,
+    bodyLengthX = 0.55,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  const FLOOR_Y    = 0.76;
+  const SHOULDER_X = 0.20;
+
+  // All x-positions scale with bodyLengthX so calibration distance gate works.
+  const scale   = bodyLengthX / 0.55;
+  const HIP_X   = SHOULDER_X + 0.30 * scale;  // 0.50 at default
+  const KNEE_X  = SHOULDER_X + 0.45 * scale;  // 0.65 at default
+  const ANKLE_X = SHOULDER_X + bodyLengthX;   // 0.75 at default
+
+  // Chest rises: shoulderY decreases (y=0 is top in screen coords)
+  const shoulderY = FLOOR_Y - shoulderRise;
+
+  // Hip lift: positive = hips rising off floor (y decreases in screen coords)
+  const hipY = FLOOR_Y - hipLiftOff;
+
+  // Legs also lift slightly when chest rises (back extension)
+  const legRise  = shoulderRise * 0.5;
+  const ankleY   = FLOOR_Y - legRise;
+  const kneeY    = FLOOR_Y - legRise * 0.7;
+
+  // Arms extended forward: wrist is further left than shoulder
+  // wrist.x < shoulder.x - 0.06 passes the armsForward gate
+  const wristX  = armsForward ? SHOULDER_X - 0.10 * scale : SHOULDER_X + 0.02;
+  const elbowX  = armsForward ? SHOULDER_X - 0.05 * scale : SHOULDER_X + 0.01;
+  const wristY  = FLOOR_Y - shoulderRise * 0.3;
+  const elbowY  = FLOOR_Y - shoulderRise * 0.15;
+
+  // Left side (primary -- camera side)
+  pose[IDX.leftShoulder] = makeLandmark(SHOULDER_X,  shoulderY, visibility);
+  pose[IDX.leftHip]      = makeLandmark(HIP_X,       hipY,      visibility);
+  pose[IDX.leftKnee]     = makeLandmark(KNEE_X,      kneeY,     visibility);
+  pose[IDX.leftAnkle]    = makeLandmark(ANKLE_X,     ankleY,    visibility);
+  pose[IDX.leftElbow]    = makeLandmark(elbowX,       elbowY,    visibility);
+  pose[IDX.leftWrist]    = makeLandmark(wristX,       wristY,    visibility);
+
+  // Right side (slight offset to differentiate)
+  pose[IDX.rightShoulder] = makeLandmark(SHOULDER_X + 0.005, shoulderY + 0.005, visibility);
+  pose[IDX.rightHip]      = makeLandmark(HIP_X      + 0.005, hipY      + 0.005, visibility);
+  pose[IDX.rightKnee]     = makeLandmark(KNEE_X     + 0.005, kneeY     + 0.005, visibility);
+  pose[IDX.rightAnkle]    = makeLandmark(ANKLE_X    + 0.005, ankleY    + 0.005, visibility);
+  pose[IDX.rightElbow]    = makeLandmark(elbowX     + 0.005, elbowY    + 0.005, visibility);
+  pose[IDX.rightWrist]    = makeLandmark(wristX     + 0.005, wristY    + 0.005, visibility);
+
+  // Head / nose (near shoulder, slightly above)
+  pose[IDX.nose]     = makeLandmark(SHOULDER_X - 0.04, shoulderY - 0.03, visibility);
+  pose[IDX.leftEar]  = makeLandmark(SHOULDER_X - 0.03, shoulderY - 0.01, visibility);
+  pose[IDX.rightEar] = makeLandmark(SHOULDER_X - 0.02, shoulderY - 0.005, visibility * 0.7);
+
+  // Heels / foot index (near ankles)
+  pose[IDX.leftHeel]       = makeLandmark(ANKLE_X - 0.01,        ankleY + 0.01,        visibility);
+  pose[IDX.rightHeel]      = makeLandmark(ANKLE_X + 0.01 + 0.005, ankleY + 0.01 + 0.005, visibility);
+  pose[IDX.leftFootIndex]  = makeLandmark(ANKLE_X + 0.02,        ankleY,               visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(ANKLE_X + 0.02 + 0.005, ankleY + 0.005,      visibility);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// SHRUG â€” front-facing standing pose with bilateral shoulder elevation.
+// shoulderElevation raises both shoulders upward (decreasing Y in screen space).
+// Geometry is identical to buildBicepCurlPose body layout.
+// ------------------------------------------------------------------------
+
+export function buildShrugPose(intent: ShrugPoseIntent): PoseLandmarks {
+  const {
+    shoulderElevation = 0,
+    torsoSwing = 0,
+    feetWidthRatio = 1.0,
+    bodyHeight = 0.70,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  const cx = 0.50;
+  const baseAnkleY = 0.92;
+  const shoulderWidth = 0.16;
+  const shoulderHalf = shoulderWidth / 2;
+  const ankleHalf = (shoulderWidth * feetWidthRatio) / 2;
+  const ankleXLeft = cx - ankleHalf;
+  const ankleXRight = cx + ankleHalf;
+  const ankleY = baseAnkleY;
+
+  // bodyHeight controls the shoulder-to-ankle span used by the distance gate.
+  // Default geometry: ankleY - shoulderMidY â‰ˆ 0.58 (within the 0.45â€“0.92 range).
+  // When bodyHeight is explicitly set, we derive shoulderMidY from it.
+  const defaultBodyHeight = 0.58; // 0.92 - 0.34
+  const effectiveBodyHeight = bodyHeight !== 0.70 ? bodyHeight : defaultBodyHeight;
+  const shoulderMidY = ankleY - effectiveBodyHeight - shoulderElevation;
+
+  // Torso swing: hip midpoint shifts horizontally
+  const hipMidX = cx + torsoSwing;
+  const hipMidY = shoulderMidY + 0.18; // hip is 0.18 below shoulder
+  const headY = shoulderMidY - 0.10;
+  const hipHalf = 0.06;
+
+  pose[IDX.nose] = makeLandmark(cx, headY, visibility);
+  pose[IDX.leftEye] = makeLandmark(cx - 0.02, headY - 0.01, visibility);
+  pose[IDX.rightEye] = makeLandmark(cx + 0.02, headY - 0.01, visibility);
+  pose[IDX.leftEar] = makeLandmark(cx - 0.035, headY, visibility);
+  pose[IDX.rightEar] = makeLandmark(cx + 0.035, headY, visibility);
+
+  const leftShoulderX = cx - shoulderHalf;
+  const rightShoulderX = cx + shoulderHalf;
+  pose[IDX.leftShoulder] = makeLandmark(leftShoulderX, shoulderMidY, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(rightShoulderX, shoulderMidY, visibility);
+  pose[IDX.leftHip] = makeLandmark(hipMidX - hipHalf, hipMidY, visibility);
+  pose[IDX.rightHip] = makeLandmark(hipMidX + hipHalf, hipMidY, visibility);
+
+  // Arms hang at sides (elbows below shoulders, wrists below elbows)
+  pose[IDX.leftElbow] = makeLandmark(leftShoulderX - 0.005, shoulderMidY + 0.13, visibility);
+  pose[IDX.rightElbow] = makeLandmark(rightShoulderX + 0.005, shoulderMidY + 0.13, visibility);
+  pose[IDX.leftWrist] = makeLandmark(leftShoulderX - 0.005, shoulderMidY + 0.26, visibility);
+  pose[IDX.rightWrist] = makeLandmark(rightShoulderX + 0.005, shoulderMidY + 0.26, visibility);
+
+  const kneeY = (hipMidY + ankleY) / 2;
+  pose[IDX.leftKnee] = makeLandmark(ankleXLeft, kneeY, visibility);
+  pose[IDX.rightKnee] = makeLandmark(ankleXRight, kneeY, visibility);
+  pose[IDX.leftAnkle] = makeLandmark(ankleXLeft, ankleY, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(ankleXRight, ankleY, visibility);
+  pose[IDX.leftHeel] = makeLandmark(ankleXLeft - 0.005, ankleY + 0.01, visibility);
+  pose[IDX.rightHeel] = makeLandmark(ankleXRight + 0.005, ankleY + 0.01, visibility);
+  pose[IDX.leftFootIndex] = makeLandmark(ankleXLeft + 0.02, ankleY, visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(ankleXRight - 0.02, ankleY, visibility);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+/**
+ * Bird-Dog pose stub â€” side-camera, user on all fours facing RIGHT.
+ * Head at camera-right, tail at camera-left.
+ * The extending leg goes BACKWARD (camera-left) and UP.
+ */
+export function buildBirdDogPose(intent: BirdDogPoseIntent): PoseLandmarks {
+  const {
+    legExtension,
+    activeLeg = 'right',
+    bodySpan = 0.60,
+    handsOverride = false,
+    bodyNotHorizontal = false,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  // Scale factor: bodySpan controls how much of the frame width the body occupies
+  const scale = bodySpan / 0.60;
+
+  // Base geometry (user facing right, scale=1.0):
+  const HEAD_X = 0.85, HEAD_Y = 0.22;
+  const SHOULDER_X = 0.68, SHOULDER_Y = 0.42;
+  const HIP_X = 0.45, HIP_Y = bodyNotHorizontal ? 0.30 : 0.42; // tilted if override
+  const REST_KNEE_X = 0.45, REST_KNEE_Y = 0.60; // at rest: knee directly below hip
+  const REST_ANKLE_X = 0.23, REST_ANKLE_Y = 0.60; // shin points LEFT, same Y as knee
+  const WRIST_Y = handsOverride ? 0.30 : 0.74; // raised if override (fails handsDown gate)
+  const ELBOW_X = 0.76, ELBOW_Y = 0.58;
+
+  // Apply scale (scale around the shoulder point as anchor)
+  const cx = SHOULDER_X;
+  function scaleX(x: number) { return cx + (x - cx) * scale; }
+
+  // Extending leg geometry: rotation model gives linear angle increase with legExtension.
+  // Thigh rotates 75Â° CCW from "pointing down" as legExtension goes 0â†’1.
+  // Shin always points LEFT (backward). This gives:
+  //   legExtension=0: hip-knee-ankle â‰ˆ 90Â° (AT_REST, rawExtension â‰ˆ 0Â°)
+  //   legExtension=0.375: extension â‰ˆ 28Â° (above EXTEND_START=20Â°, below AT_EXTENDED=50Â°)
+  //   legExtension=0.875: extension â‰ˆ 66Â° (above AT_EXTENDED=50Â°)
+  //   legExtension=1.0: extension â‰ˆ 75Â°
+  const rotRad = legExtension * 75 * Math.PI / 180;
+  const L_thigh = 0.18, L_shin = 0.22;
+  const extKneeX = HIP_X - L_thigh * Math.sin(rotRad);
+  const extKneeY = HIP_Y + L_thigh * Math.cos(rotRad);
+  const extAnkleX = extKneeX - L_shin; // shin points LEFT
+  const extAnkleY = extKneeY;
+
+  // Near side (activeLeg side = the one we can clearly see)
+  const [nearIdx, farIdx] = activeLeg === 'right'
+    ? [{ knee: IDX.rightKnee, ankle: IDX.rightAnkle, hip: IDX.rightHip, shoulder: IDX.rightShoulder }
+      ,{ knee: IDX.leftKnee,  ankle: IDX.leftAnkle,  hip: IDX.leftHip,  shoulder: IDX.leftShoulder  }]
+    : [{ knee: IDX.leftKnee,  ankle: IDX.leftAnkle,  hip: IDX.leftHip,  shoulder: IDX.leftShoulder  }
+      ,{ knee: IDX.rightKnee, ankle: IDX.rightAnkle, hip: IDX.rightHip, shoulder: IDX.rightShoulder }];
+
+  // Set landmarks
+  pose[IDX.nose]          = makeLandmark(scaleX(HEAD_X),     HEAD_Y,     visibility);
+  pose[nearIdx.shoulder]  = makeLandmark(scaleX(SHOULDER_X), SHOULDER_Y, visibility);
+  pose[farIdx.shoulder]   = makeLandmark(scaleX(SHOULDER_X), SHOULDER_Y + 0.01, visibility * 0.7);
+  pose[nearIdx.hip]       = makeLandmark(scaleX(HIP_X),      HIP_Y,      visibility);
+  pose[farIdx.hip]        = makeLandmark(scaleX(HIP_X),      HIP_Y + 0.01, visibility * 0.7);
+
+  // Extending (active) leg
+  pose[nearIdx.knee]      = makeLandmark(scaleX(extKneeX),   extKneeY,   visibility);
+  pose[nearIdx.ankle]     = makeLandmark(scaleX(extAnkleX),  extAnkleY,  visibility);
+
+  // Non-extending (rest) leg â€” stays in quadruped position
+  pose[farIdx.knee]       = makeLandmark(scaleX(REST_KNEE_X + 0.03), REST_KNEE_Y, visibility * 0.6);
+  pose[farIdx.ankle]      = makeLandmark(scaleX(REST_ANKLE_X + 0.03), REST_ANKLE_Y, visibility * 0.6);
+
+  // Arms â€” on floor (wrists below shoulders)
+  pose[IDX.rightWrist]    = makeLandmark(scaleX(0.80),    WRIST_Y,    visibility);
+  pose[IDX.rightElbow]    = makeLandmark(scaleX(ELBOW_X), ELBOW_Y,    visibility);
+  pose[IDX.leftWrist]     = makeLandmark(scaleX(0.45),    WRIST_Y,    visibility * 0.7);
+  pose[IDX.leftElbow]     = makeLandmark(scaleX(ELBOW_X - 0.35), ELBOW_Y, visibility * 0.7);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+/**
+ * Step-Up pose stub â€” front-facing camera, standing.
+ * As hipRise increases, entire upper body shifts upward (hip Y decreases).
+ * The step platform height is implicit in the hipRise value.
+ */
+export function buildStepUpPose(intent: StepUpPoseIntent): PoseLandmarks {
+  const {
+    hipRise,
+    feetWidthRatio = 1.0,
+    trunkLeanDeg = 0,
+    valgusRatio = 0,
+    bodyHeight = 0.70,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  // Build base as a standing pose (kneeFlexionDeg=0)
+  // Then shift hip and shoulder upward by hipRise
+  const baseIntent: SquatPoseIntent = {
+    kneeFlexionDeg: 0,        // standing straight
+    feetWidthRatio,
+    armsOverhead: false,      // arms at sides
+    trunkLeanDeg,
+    valgusRatio,
+    bodyHeight,
+    noise: 0,                 // apply noise after shift
+    seed,
+    visibility,
+  };
+
+  const pose = buildSquatPose(baseIntent);
+
+  // Shift entire upper body up by hipRise (hip Y decreases = person goes higher in frame)
+  const shiftY = hipRise;
+
+  const upperBodyLandmarks = [
+    IDX.leftShoulder, IDX.rightShoulder,
+    IDX.leftElbow, IDX.rightElbow,
+    IDX.leftWrist, IDX.rightWrist,
+    IDX.leftHip, IDX.rightHip,
+    IDX.nose,
+  ];
+
+  for (const idx of upperBodyLandmarks) {
+    if (pose[idx]) pose[idx].y -= shiftY;
+  }
+
+  // Knees move up by fraction of the hip rise
+  const kneeShiftY = shiftY * 0.7;
+  if (pose[IDX.leftKnee]) pose[IDX.leftKnee].y -= kneeShiftY;
+  if (pose[IDX.rightKnee]) pose[IDX.rightKnee].y -= kneeShiftY;
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+/**
+ * Walking-Lunge pose stub â€” identical to buildLungePose.
+ * Same front-camera geometry, same joint angles.
+ */
+export const buildWalkingLungePose = buildLungePose;
+
+// ------------------------------------------------------------------------
+// REVERSE FLY â€” front-facing, bent-over position.
+//
+// The user is hinged forward at ~45Â°, arms hang below shoulders.
+// As armLiftDeg increases (0â†’90), wrists rise from below-shoulder to shoulder level.
+//
+// Key geometry (same as lateral raise but torso is bent forward):
+//   bentOver=true:  shoulderMidY > hipMidY (shoulders lower in frame than hips)
+//   armsHanging: wristY = shoulderY + 0.20 (below shoulders)
+//   armLiftDeg=0: wristY = shoulderY + RF_ARM_L * cos(0) = shoulderY + RF_ARM_L
+//   armLiftDeg=90: wristY = shoulderY + RF_ARM_L * cos(Ï€/2) = shoulderY (at shoulder level)
+// ------------------------------------------------------------------------
+
+const RF_ARM_L = 0.24; // upper arm + forearm combined in normalised coords
+
+function revFlyArmGeom(
+  shoulderX: number,
+  shoulderY: number,
+  liftDeg: number,
+  side: 'left' | 'right',
+) {
+  const thetaRad = (liftDeg * Math.PI) / 180;
+  const sign = side === 'left' ? -1 : 1;
+  const wristX = shoulderX + sign * RF_ARM_L * Math.sin(thetaRad);
+  const wristY = shoulderY + RF_ARM_L * Math.cos(thetaRad);
+  const halfL = RF_ARM_L / 2;
+  const elbowX = shoulderX + sign * halfL * Math.sin(thetaRad);
+  const elbowY = shoulderY + halfL * Math.cos(thetaRad);
+  return { wristX, wristY, elbowX, elbowY };
+}
+
+export function buildReverseFlyPose(intent: ReverseFlyPoseIntent): PoseLandmarks {
+  const {
+    armLiftDeg: liftDeg,
+    leftArmLiftDeg,
+    rightArmLiftDeg,
+    bentOver = true,
+    distanceOk: _distOk = true,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  const cx = 0.50;
+  const shoulderWidth = 0.16;
+  const shoulderHalf = shoulderWidth / 2;
+  const ankleHalf = 0.08; // feet hip-width
+
+  const ankleXLeft  = cx - ankleHalf;
+  const ankleXRight = cx + ankleHalf;
+  const ankleY = 0.92;
+
+  // When bent-over: hips are in the upper-middle of the frame.
+  // Shoulders are slightly BELOW hips in the frame (shoulderMidY > hipMidY) because
+  // the torso has hinged forward. However, the body height (ankleY - shoulderY) must
+  // still be within the calibration range (0.42â€“0.92).
+  //
+  // With ankleY=0.92 and BODY_HEIGHT_MIN_ENTER=0.42:
+  //   shoulderY must be <= 0.92 - 0.42 = 0.50 for bodyHeight >= 0.42.
+  //
+  // Bent-over geometry: hips at 0.40, shoulders at 0.45 (below hips â†’ +0.05 above threshold).
+  // This gives bodyHeight = 0.92 - 0.45 = 0.47 âœ“ (within 0.42â€“0.92).
+  // Standing: hips at 0.50, shoulders at 0.30 (above hips in normal posture).
+  const hipMidX = cx;
+
+  let hipMidY: number;
+  let shoulderMidY: number;
+
+  if (bentOver) {
+    // Bent-over: hips near top-third, shoulders just below hips (bent forward)
+    hipMidY = 0.40;
+    shoulderMidY = hipMidY + 0.06; // shoulders 0.06 below hips in frame â†’ satisfies BENT_OVER_THRESHOLD=0.03
+    // bodyHeight = ankleY - shoulderMidY = 0.92 - 0.46 = 0.46 âœ“ within [0.42, 0.92]
+  } else {
+    // Standing: hips at ~0.52, shoulders above at ~0.34
+    hipMidY = 0.52;
+    shoulderMidY = hipMidY - 0.18; // shoulders above hips (normal upright posture)
+    // bodyHeight = ankleY - shoulderMidY = 0.92 - 0.34 = 0.58 âœ“
+  }
+
+  const headY = bentOver ? shoulderMidY + 0.08 : shoulderMidY - 0.10;
+  const hipHalf = 0.06;
+
+  pose[IDX.nose]     = makeLandmark(cx,          headY,        visibility);
+  pose[IDX.leftEye]  = makeLandmark(cx - 0.02,   headY - 0.01, visibility);
+  pose[IDX.rightEye] = makeLandmark(cx + 0.02,   headY - 0.01, visibility);
+  pose[IDX.leftEar]  = makeLandmark(cx - 0.035,  headY,        visibility);
+  pose[IDX.rightEar] = makeLandmark(cx + 0.035,  headY,        visibility);
+
+  const leftShoulderX  = cx - shoulderHalf;
+  const rightShoulderX = cx + shoulderHalf;
+  pose[IDX.leftShoulder]  = makeLandmark(leftShoulderX,  shoulderMidY, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(rightShoulderX, shoulderMidY, visibility);
+  pose[IDX.leftHip]  = makeLandmark(hipMidX - hipHalf, hipMidY, visibility);
+  pose[IDX.rightHip] = makeLandmark(hipMidX + hipHalf, hipMidY, visibility);
+
+  const leftLift  = leftArmLiftDeg  ?? liftDeg;
+  const rightLift = rightArmLiftDeg ?? liftDeg;
+  const leftArm  = revFlyArmGeom(leftShoulderX,  shoulderMidY, leftLift,  'left');
+  const rightArm = revFlyArmGeom(rightShoulderX, shoulderMidY, rightLift, 'right');
+
+  pose[IDX.leftElbow]  = makeLandmark(leftArm.elbowX,  leftArm.elbowY,  visibility);
+  pose[IDX.rightElbow] = makeLandmark(rightArm.elbowX, rightArm.elbowY, visibility);
+  pose[IDX.leftWrist]  = makeLandmark(leftArm.wristX,  leftArm.wristY,  visibility);
+  pose[IDX.rightWrist] = makeLandmark(rightArm.wristX, rightArm.wristY, visibility);
+
+  const kneeY = (hipMidY + ankleY) / 2;
+  pose[IDX.leftKnee]  = makeLandmark(ankleXLeft,  kneeY, visibility);
+  pose[IDX.rightKnee] = makeLandmark(ankleXRight, kneeY, visibility);
+  pose[IDX.leftAnkle]  = makeLandmark(ankleXLeft,  ankleY, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(ankleXRight, ankleY, visibility);
+  pose[IDX.leftHeel]   = makeLandmark(ankleXLeft  - 0.005, ankleY + 0.01, visibility);
+  pose[IDX.rightHeel]  = makeLandmark(ankleXRight + 0.005, ankleY + 0.01, visibility);
+  pose[IDX.leftFootIndex]  = makeLandmark(ankleXLeft  + 0.02, ankleY, visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(ankleXRight - 0.02, ankleY, visibility);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// GOBLET SQUAT â€” front-facing, symmetric swing-out geometry (same as squat)
+// + elbow spread positioning to model goblet hold.
+//
+// elbowSpreadRatio = elbowWidth / shoulderWidth.
+//   1.0 = elbows at shoulder width (good goblet grip, elbows spread out)
+//   0.5 = elbows collapsed inward
+// Elbows are placed at chest height (shoulderY + 0.10) at the given spread.
+// ------------------------------------------------------------------------
+
+export function buildGobletSquatPose(intent: GobletSquatPoseIntent | null): PoseLandmarks {
+  if (!intent) {
+    // null intent â†’ all landmarks invisible (position-lost scenario)
+    const pose = emptyPose();
+    for (const lm of pose) lm.visibility = 0;
+    return pose;
+  }
+
+  const {
+    kneeFlexionDeg: flexDeg,
+    elbowSpreadRatio = 1.0,
+    feetWidthRatio = 1.25,
+    heelLift = 0,
+    valgusRatio = 0,
+    trunkLeanDeg: trunkLean = 0,
+    bodyHeight = 0.70,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  const cx = 0.50;
+  const baseAnkleY = 0.92;
+  const ankleY = baseAnkleY - heelLift;
+
+  const shoulderWidth = 0.16;
+  const shoulderHalf = shoulderWidth / 2;
+  const ankleHalf = (shoulderWidth * feetWidthRatio) / 2;
+  const ankleXLeft = cx - ankleHalf;
+  const ankleXRight = cx + ankleHalf;
+
+  const left = legGeometry(ankleXLeft, ankleY, flexDeg, -1);
+  const right = legGeometry(ankleXRight, ankleY, flexDeg, +1);
+
+  const adjLeftKneeX = left.kneeX * (1 - valgusRatio) + cx * valgusRatio;
+  const adjRightKneeX = right.kneeX * (1 - valgusRatio) + cx * valgusRatio;
+
+  const hipMidX = (left.hipX + right.hipX) / 2;
+  const hipMidY = (left.hipY + right.hipY) / 2;
+  const torsoHeight = 0.18;
+
+  const leanRad = (trunkLean * Math.PI) / 180;
+  const shoulderY = hipMidY - torsoHeight * Math.cos(leanRad);
+  const shoulderXShift = Math.sin(leanRad) * torsoHeight;
+
+  const headY = shoulderY - 0.10;
+
+  pose[IDX.nose] = makeLandmark(hipMidX + shoulderXShift, headY, visibility);
+  pose[IDX.leftEye] = makeLandmark(hipMidX - 0.02 + shoulderXShift, headY - 0.01, visibility);
+  pose[IDX.rightEye] = makeLandmark(hipMidX + 0.02 + shoulderXShift, headY - 0.01, visibility);
+  pose[IDX.leftEar] = makeLandmark(hipMidX - 0.035 + shoulderXShift, headY, visibility);
+  pose[IDX.rightEar] = makeLandmark(hipMidX + 0.035 + shoulderXShift, headY, visibility);
+
+  const leftShoulderX = hipMidX - shoulderHalf + shoulderXShift;
+  const rightShoulderX = hipMidX + shoulderHalf + shoulderXShift;
+
+  pose[IDX.leftShoulder] = makeLandmark(leftShoulderX, shoulderY, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(rightShoulderX, shoulderY, visibility);
+
+  // Goblet hold: elbows at chest level (shoulderY + 0.10), spread by elbowSpreadRatio
+  // elbowHalf = shoulderWidth * elbowSpreadRatio / 2
+  const elbowHalf = (shoulderWidth * elbowSpreadRatio) / 2;
+  const elbowY = shoulderY + 0.10;
+  pose[IDX.leftElbow] = makeLandmark(cx - elbowHalf, elbowY, visibility);
+  pose[IDX.rightElbow] = makeLandmark(cx + elbowHalf, elbowY, visibility);
+  // Wrists close together at center (holding the weight)
+  pose[IDX.leftWrist] = makeLandmark(cx - 0.02, elbowY + 0.06, visibility);
+  pose[IDX.rightWrist] = makeLandmark(cx + 0.02, elbowY + 0.06, visibility);
+
+  pose[IDX.leftHip] = makeLandmark(left.hipX, left.hipY, visibility);
+  pose[IDX.rightHip] = makeLandmark(right.hipX, right.hipY, visibility);
+
+  pose[IDX.leftKnee] = makeLandmark(adjLeftKneeX, left.kneeY, visibility);
+  pose[IDX.rightKnee] = makeLandmark(adjRightKneeX, right.kneeY, visibility);
+
+  pose[IDX.leftAnkle] = makeLandmark(ankleXLeft, ankleY, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(ankleXRight, ankleY, visibility);
+
+  pose[IDX.leftHeel] = makeLandmark(ankleXLeft - 0.005, ankleY + 0.01, visibility);
+  pose[IDX.rightHeel] = makeLandmark(ankleXRight + 0.005, ankleY + 0.01, visibility);
+  pose[IDX.leftFootIndex] = makeLandmark(ankleXLeft + 0.02, ankleY, visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(ankleXRight - 0.02, ankleY, visibility);
+
+  void bodyHeight;
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// ------------------------------------------------------------------------
+// DONKEY KICK â€” side-facing camera, user on all fours (quadruped).
+//
+// Same base geometry as bird-dog. User faces RIGHT in the frame.
+// The active leg kicks UPWARD: knee moves backward and up from below the hip.
+//
+// Key geometry:
+//   thighLiftDeg=0:  knee.y = hip.y + L_THIGH (knee directly below hip)
+//   thighLiftDeg=T:  knee.x decreases (moves behind hip), knee.y decreases (moves up)
+//   Ankle: shin points downward/backward â€” ankle always below and behind knee
+// ------------------------------------------------------------------------
+
+export function buildDonkeyKickPose(intent: DonkeyKickPoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    // Return pose with all landmarks at zero visibility (position lost)
+    const nullPoseDK = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) {
+      nullPoseDK[i] = makeLandmark(0.5, 0.5, 0);
+    }
+    return nullPoseDK;
+  }
+
+  const {
+    thighLiftDeg: liftDeg,
+    bentOver = true,
+    handsDown = true,
+    bodySpan = 0.60,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const dkPose = emptyPose();
+
+  // Scale factor: bodySpan controls how much of the frame width the body occupies
+  const dkScale = bodySpan / 0.60;
+
+  // Base geometry (user facing right, scale=1.0):
+  // Shoulder is at camera-right (head side), hip is to the left (tail side)
+  const DK_SHOULDER_X = 0.68;
+  const DK_SHOULDER_Y = 0.42;
+  const DK_HIP_X = 0.45;
+  // Body horizontal when bentOver=true (hip same height as shoulder)
+  const DK_HIP_Y = bentOver ? 0.42 : 0.30; // tilted if not bent over
+
+  const DK_L_THIGH = 0.18; // thigh length in normalized coords
+  const DK_L_SHIN  = 0.18; // shin length (knee bent ~90Â°, shin pointing down/back)
+
+  // Thigh rotation: at liftDeg=0, knee is directly below hip.
+  // As liftDeg increases, knee moves backward (away from head side) and up.
+  const dkRotRad = liftDeg * Math.PI / 180;
+  // In side view: backward = decreasing X (toward camera-left = behind user)
+  const dkExtKneeX = DK_HIP_X - DK_L_THIGH * Math.sin(dkRotRad);
+  const dkExtKneeY = DK_HIP_Y + DK_L_THIGH * Math.cos(dkRotRad);
+  // Ankle: shin points backward (left in side view) to give enough body span for calibration.
+  // Using DK_L_SHIN * 1.0 for X component (shin points fully left = backward at rest).
+  // This gives span = |ankle.x - shoulder.x| >= 0.41, passing the 0.40 gate.
+  const dkExtAnkleX = dkExtKneeX - DK_L_SHIN; // shin points left (backward)
+  const dkExtAnkleY = dkExtKneeY + DK_L_SHIN * 0.3; // slightly downward
+
+  // Wrist position: below shoulder when handsDown=true (calibration valid)
+  const DK_WRIST_Y = handsDown ? DK_SHOULDER_Y + 0.32 : DK_SHOULDER_Y - 0.10;
+  const DK_WRIST_X = DK_SHOULDER_X + 0.12;
+  const DK_ELBOW_Y = DK_SHOULDER_Y + 0.18;
+  const DK_ELBOW_X = DK_SHOULDER_X + 0.06;
+
+  // Apply scale (scale around the shoulder point as anchor)
+  const dkCx = DK_SHOULDER_X;
+  function dkScaleX(x: number) { return dkCx + (x - dkCx) * dkScale; }
+
+  // Set landmarks â€” use both left and right (engine picks whichever has higher lift)
+  dkPose[IDX.leftShoulder]  = makeLandmark(dkScaleX(DK_SHOULDER_X), DK_SHOULDER_Y, visibility);
+  dkPose[IDX.rightShoulder] = makeLandmark(dkScaleX(DK_SHOULDER_X), DK_SHOULDER_Y + 0.01, visibility * 0.7);
+  dkPose[IDX.leftHip]       = makeLandmark(dkScaleX(DK_HIP_X),      DK_HIP_Y,      visibility);
+  dkPose[IDX.rightHip]      = makeLandmark(dkScaleX(DK_HIP_X),      DK_HIP_Y + 0.01, visibility * 0.7);
+
+  // Active (near) leg â€” left side (visible to camera in right-facing setup)
+  dkPose[IDX.leftKnee]  = makeLandmark(dkScaleX(dkExtKneeX),  dkExtKneeY,  visibility);
+  dkPose[IDX.leftAnkle] = makeLandmark(dkScaleX(dkExtAnkleX), dkExtAnkleY, visibility);
+
+  // Non-active (far) leg â€” stays in quadruped rest position
+  const dkRestKneeX  = DK_HIP_X;
+  const dkRestKneeY  = DK_HIP_Y + DK_L_THIGH; // knee directly below hip
+  const dkRestAnkleX = dkRestKneeX - DK_L_SHIN; // shin points left (backward)
+  const dkRestAnkleY = dkRestKneeY + DK_L_SHIN * 0.3;
+  dkPose[IDX.rightKnee]  = makeLandmark(dkScaleX(dkRestKneeX + 0.03),  dkRestKneeY,  visibility * 0.6);
+  dkPose[IDX.rightAnkle] = makeLandmark(dkScaleX(dkRestAnkleX + 0.03), dkRestAnkleY, visibility * 0.6);
+
+  // Arms â€” on floor (wrists below shoulders during calibration)
+  dkPose[IDX.leftWrist]   = makeLandmark(dkScaleX(DK_WRIST_X),        DK_WRIST_Y,  visibility);
+  dkPose[IDX.leftElbow]   = makeLandmark(dkScaleX(DK_ELBOW_X),        DK_ELBOW_Y,  visibility);
+  dkPose[IDX.rightWrist]  = makeLandmark(dkScaleX(DK_WRIST_X - 0.35), DK_WRIST_Y,  visibility * 0.7);
+  dkPose[IDX.rightElbow]  = makeLandmark(dkScaleX(DK_ELBOW_X - 0.35), DK_ELBOW_Y,  visibility * 0.7);
+
+  dkPose[IDX.nose] = makeLandmark(dkScaleX(0.85), 0.22, visibility);
+
+  applyOcclusion(dkPose, occludedIndices);
+  return dkPose;
+}
+
+// ------------------------------------------------------------------------
+// FIRE HYDRANT â€” side-facing camera, user on all fours (quadruped).
+//
+// Identical base geometry to donkey-kick. The fire hydrant lifts the knee
+// LATERALLY (out to the side), but from the 2D side camera, the observable
+// signal is the same: the knee rises above the hip. thighLiftDeg is computed
+// as the angle of the hipâ†’knee vector from "pointing straight down" (0Â°).
+//   thighLiftDeg=0:  knee.y = hip.y + L_THIGH (knee directly below hip)
+//   thighLiftDeg=T:  knee moves outward and up (here: backward in side view)
+// ------------------------------------------------------------------------
+
+export function buildFireHydrantPose(intent: FireHydrantPoseIntent | null): PoseLandmarks {
+  if (intent === null) {
+    const nullPose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) nullPose[i] = makeLandmark(0.5, 0.5, 0);
+    return nullPose;
+  }
+
+  const {
+    thighLiftDeg: liftDeg,
+    bentOver = true,
+    handsDown = true,
+    bodySpan = 0.60,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const fhPose = emptyPose();
+
+  const fhScale = bodySpan / 0.60;
+
+  const FH_SHOULDER_X = 0.68;
+  const FH_SHOULDER_Y = 0.42;
+  const FH_HIP_X = 0.45;
+  const FH_HIP_Y = bentOver ? 0.42 : 0.30;
+
+  const FH_L_THIGH = 0.18;
+  const FH_L_SHIN  = 0.18;
+
+  const fhRotRad = liftDeg * Math.PI / 180;
+  const fhExtKneeX = FH_HIP_X - FH_L_THIGH * Math.sin(fhRotRad);
+  const fhExtKneeY = FH_HIP_Y + FH_L_THIGH * Math.cos(fhRotRad);
+  const fhExtAnkleX = fhExtKneeX - FH_L_SHIN;
+  const fhExtAnkleY = fhExtKneeY + FH_L_SHIN * 0.3;
+
+  const FH_WRIST_Y = handsDown ? FH_SHOULDER_Y + 0.32 : FH_SHOULDER_Y - 0.10;
+  const FH_WRIST_X = FH_SHOULDER_X + 0.12;
+  const FH_ELBOW_Y = FH_SHOULDER_Y + 0.18;
+  const FH_ELBOW_X = FH_SHOULDER_X + 0.06;
+
+  const fhCx = FH_SHOULDER_X;
+  function fhScaleX(x: number) { return fhCx + (x - fhCx) * fhScale; }
+
+  fhPose[IDX.leftShoulder]  = makeLandmark(fhScaleX(FH_SHOULDER_X), FH_SHOULDER_Y, visibility);
+  fhPose[IDX.rightShoulder] = makeLandmark(fhScaleX(FH_SHOULDER_X), FH_SHOULDER_Y + 0.01, visibility * 0.7);
+  fhPose[IDX.leftHip]       = makeLandmark(fhScaleX(FH_HIP_X),      FH_HIP_Y,      visibility);
+  fhPose[IDX.rightHip]      = makeLandmark(fhScaleX(FH_HIP_X),      FH_HIP_Y + 0.01, visibility * 0.7);
+
+  // Active (near) leg â€” left side (visible to camera)
+  fhPose[IDX.leftKnee]  = makeLandmark(fhScaleX(fhExtKneeX),  fhExtKneeY,  visibility);
+  fhPose[IDX.leftAnkle] = makeLandmark(fhScaleX(fhExtAnkleX), fhExtAnkleY, visibility);
+
+  // Non-active (far) leg â€” stays in quadruped rest
+  const fhRestKneeX  = FH_HIP_X;
+  const fhRestKneeY  = FH_HIP_Y + FH_L_THIGH;
+  const fhRestAnkleX = fhRestKneeX - FH_L_SHIN;
+  const fhRestAnkleY = fhRestKneeY + FH_L_SHIN * 0.3;
+  fhPose[IDX.rightKnee]  = makeLandmark(fhScaleX(fhRestKneeX + 0.03),  fhRestKneeY,  visibility * 0.6);
+  fhPose[IDX.rightAnkle] = makeLandmark(fhScaleX(fhRestAnkleX + 0.03), fhRestAnkleY, visibility * 0.6);
+
+  // Arms â€” on floor
+  fhPose[IDX.leftWrist]   = makeLandmark(fhScaleX(FH_WRIST_X),        FH_WRIST_Y,  visibility);
+  fhPose[IDX.leftElbow]   = makeLandmark(fhScaleX(FH_ELBOW_X),        FH_ELBOW_Y,  visibility);
+  fhPose[IDX.rightWrist]  = makeLandmark(fhScaleX(FH_WRIST_X - 0.35), FH_WRIST_Y,  visibility * 0.7);
+  fhPose[IDX.rightElbow]  = makeLandmark(fhScaleX(FH_ELBOW_X - 0.35), FH_ELBOW_Y,  visibility * 0.7);
+
+  fhPose[IDX.nose] = makeLandmark(fhScaleX(0.85), 0.22, visibility);
+
+  applyOcclusion(fhPose, occludedIndices);
+  return fhPose;
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// CURTSY LUNGE â€” front camera, standing, one knee bends with rear ankle crossover
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+/**
+ * Build a curtsy-lunge pose from intent.
+ *
+ * Key geometry:
+ *   - Front (active/standing) leg bends to kneeFlexionDeg (170 = straight, 90 = deep)
+ *   - Rear ankle crosses behind front ankle by crossoverRatio Ã— hipWidth
+ *   - We always put the left leg as front for simplicity (engine detects the more-bent leg)
+ *   - feetWidth â‰ˆ 0.85Ã— hipWidth so the feetWide gate passes (0.7â€“1.4Ã— hip ratio)
+ */
+export function buildCurtsyLungePose(intent: CurtsyLungePoseIntent): PoseLandmarks {
+  const {
+    kneeFlexionDeg,
+    crossoverRatio = 0,
+    trunkLeanDeg = 0,
+    hipRotationRatio,
+    hipRotation,
+    kneeValgusRatio = 0,
+    bodyHeight = 0.638,
+    armsRaised = false,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+    isNull,
+  } = intent;
+  const effectiveHipRotationRatio = hipRotation ?? hipRotationRatio ?? 0;
+
+  if (isNull) {
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i] = makeLandmark(0.5, 0.5, 0);
+    return pose;
+  }
+
+  const pose = emptyPose();
+
+  const cx = 0.50;
+  const ankleY = 0.92;
+  const hipWidth = 0.14;   // hip-width in normalized coords
+  const hipHalf = hipWidth / 2;
+  // feet hip-width (ratio 1.0 Ã— hipWidth â€” easily within 0.7â€“1.4 gate)
+  const feetHalf = hipHalf;
+
+  const leftAnkleX = cx - feetHalf;
+  const rightAnkleX = cx + feetHalf;
+
+  // bodyHeight controls the shoulder-to-ankle span for calibration distance gate
+  // Calibration: bodyHeight = |ankleY - shoulderY|
+  // We scale the whole body so that shoulderY = ankleY - bodyHeight
+  const targetShoulderY = ankleY - bodyHeight;
+
+  // Front (left) leg: bends to kneeFlexionDeg (joint angle, 180=straight, 90=deep curtsy).
+  // Uses sign=-1: knee swings LEFT (outward) for normal curtsy geometry.
+  const L = 0.22;
+  const flexDeg = 180 - kneeFlexionDeg;  // 0 = straight, 90 = deep
+  const leftLeg = legGeometry(leftAnkleX, ankleY, flexDeg, -1);
+
+  // Valgus encoding: when valgusRatio > 0, place knee to the RIGHT of ankle (absolute target).
+  // This makes the knee appear "inside" of the ankle (valgus). The kneeY stays from legGeometry.
+  // At ankle=0.43: target kneeX = 0.43 + valgusRatio*0.16. At ratio=0.25: 0.43+0.04=0.47.
+  // This gives computed angle â‰ˆ 153Â° at 90Â° depth (< 155Â° â†’ DESCENDING state = inActiveRep)
+  // and â‰ˆ 169Â° at 165Â° depth (> 155Â° â†’ STANDING state = gated, frontLeg=null â†’ returns false).
+  // At ratio=0: uses natural legGeometry.kneeX (no angle distortion).
+  const leftKneeX = kneeValgusRatio > 0
+    ? leftAnkleX + kneeValgusRatio * 0.16
+    : leftLeg.kneeX;
+  const leftKneeY = leftLeg.kneeY;
+  const leftHipX = leftLeg.hipX;
+  const leftHipY = leftLeg.hipY;
+
+  // Rear (right) leg:
+  // - At crossoverRatio=0 (calibration/standing): right ankle at normal position (cx+feetHalf)
+  //   This ensures feetWidth = 2*feetHalf = hipWidth â†’ feetWide gate passes (ratio = 1.0)
+  // - At crossoverRatio>0 (active curtsy): rear ankle crosses past front ankle
+  //   engine_crossover = (leftAnkle.x - rearAnkle.x) / baseline.hipWidth = crossoverRatio
+  //   â†’ rearAnkleX = leftAnkleX - crossoverRatio * hipWidth
+  const rearAnkleX = crossoverRatio > 0
+    ? leftAnkleX - crossoverRatio * hipWidth   // crossing phase: encodes crossoverRatio exactly
+    : cx + feetHalf;                           // standing: feet at normal hip-width apart
+  const rearKneeX = cx + feetHalf * 0.5;
+  const rearKneeY = ankleY - L * 0.95;
+  const rightHipX = cx + feetHalf;
+  // Hip rotation: rear hip rises (smaller Y). Use bodyHeight*0.30 as torso estimate for scaling.
+  const torsoHeightApprox = bodyHeight * 0.30;
+  const rightHipY = leftHipY - (effectiveHipRotationRatio * torsoHeightApprox);  // rises = smaller Y
+
+  const hipMidX = (leftHipX + rightHipX) / 2;
+  const hipMidY = (leftHipY + rightHipY) / 2;
+  // Torso height = distance from hip to shoulder, scaled so that shoulder lands at targetShoulderY
+  const torsoHeight = hipMidY - targetShoulderY;
+
+  const leanRad = (trunkLeanDeg * Math.PI) / 180;
+  const shoulderY = hipMidY - torsoHeight * Math.cos(leanRad);
+  const shoulderXShift = Math.sin(leanRad) * torsoHeight;
+  const shoulderHalf = 0.10;
+
+  const headY = shoulderY - 0.08;
+
+  pose[IDX.nose]       = makeLandmark(cx + shoulderXShift, headY,          visibility);
+  pose[IDX.leftEye]    = makeLandmark(cx - 0.02 + shoulderXShift, headY - 0.01, visibility);
+  pose[IDX.rightEye]   = makeLandmark(cx + 0.02 + shoulderXShift, headY - 0.01, visibility);
+  pose[IDX.leftEar]    = makeLandmark(cx - 0.03 + shoulderXShift, headY,    visibility);
+  pose[IDX.rightEar]   = makeLandmark(cx + 0.03 + shoulderXShift, headY,    visibility);
+
+  pose[IDX.leftShoulder]  = makeLandmark(cx - shoulderHalf + shoulderXShift, shoulderY, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(cx + shoulderHalf + shoulderXShift, shoulderY, visibility);
+
+  // Arms: relaxed at sides (wrists below hips) or raised overhead (fails calibration gate)
+  const wristY = armsRaised ? shoulderY - 0.18 : hipMidY + 0.08;
+  const elbowY = armsRaised ? shoulderY - 0.08 : shoulderY + 0.08;
+  pose[IDX.leftElbow]  = makeLandmark(cx - shoulderHalf - 0.01, elbowY, visibility);
+  pose[IDX.rightElbow] = makeLandmark(cx + shoulderHalf + 0.01, elbowY, visibility);
+  pose[IDX.leftWrist]  = makeLandmark(cx - shoulderHalf - 0.01, wristY, visibility);
+  pose[IDX.rightWrist] = makeLandmark(cx + shoulderHalf + 0.01, wristY, visibility);
+
+  pose[IDX.leftHip]  = makeLandmark(leftHipX,  leftHipY,  visibility);
+  pose[IDX.rightHip] = makeLandmark(rightHipX, rightHipY, visibility);
+
+  pose[IDX.leftKnee]  = makeLandmark(leftKneeX,  leftKneeY,  visibility);
+  pose[IDX.rightKnee] = makeLandmark(rearKneeX,  rearKneeY,  visibility);
+
+  pose[IDX.leftAnkle]  = makeLandmark(leftAnkleX, ankleY, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(rearAnkleX, ankleY, visibility);
+
+  pose[IDX.leftHeel]      = makeLandmark(leftAnkleX - 0.005, ankleY + 0.01, visibility);
+  pose[IDX.rightHeel]     = makeLandmark(rearAnkleX - 0.005, ankleY + 0.01, visibility);
+  pose[IDX.leftFootIndex] = makeLandmark(leftAnkleX + 0.02,  ankleY,        visibility);
+  pose[IDX.rightFootIndex]= makeLandmark(rearAnkleX + 0.02,  ankleY,        visibility);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// PALLOF PRESS â€” front camera, standing, arms press out from chest
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+/**
+ * Build a pallof-press pose from intent.
+ * elbowExtensionDeg: 90 = hands at chest, 165 = arms fully extended.
+ * The engine computes elbow angle from shoulder-elbow-wrist triangle.
+ */
+export function buildPallofPressPose(intent: PallofPressPoseIntent): PoseLandmarks {
+  const {
+    elbowExtensionDeg,
+    torsoRotationDeg = 0,
+    shoulderShrug: _shoulderShrug = 0,
+    visibility = 0.95,
+    isNull,
+  } = intent;
+
+  if (isNull) {
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i] = makeLandmark(0.5, 0.5, 0);
+    return pose;
+  }
+
+  const pose = emptyPose();
+  const cx = 0.50;
+  const shoulderY = 0.30;
+  const ankleY = 0.90;
+  const hipY = 0.56;
+  const shoulderHalf = 0.10;
+
+  // Torso rotation: shift left vs right shoulder Y slightly
+  const rotRad = (torsoRotationDeg * Math.PI) / 180;
+  const shoulderYDelta = Math.sin(rotRad) * 0.03;
+
+  pose[IDX.nose]       = makeLandmark(cx, shoulderY - 0.10, visibility);
+  pose[IDX.leftEye]    = makeLandmark(cx - 0.02, shoulderY - 0.11, visibility);
+  pose[IDX.rightEye]   = makeLandmark(cx + 0.02, shoulderY - 0.11, visibility);
+  pose[IDX.leftEar]    = makeLandmark(cx - 0.03, shoulderY - 0.10, visibility);
+  pose[IDX.rightEar]   = makeLandmark(cx + 0.03, shoulderY - 0.10, visibility);
+
+  pose[IDX.leftShoulder]  = makeLandmark(cx - shoulderHalf, shoulderY - shoulderYDelta, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(cx + shoulderHalf, shoulderY + shoulderYDelta, visibility);
+
+  // Arms: elbow + wrist positioned so shoulder-elbow-wrist angle = elbowExtensionDeg
+  // Arms extend forward (in the horizontal plane visible as horizontal in 2D front view)
+  const extRad = (elbowExtensionDeg * Math.PI) / 180;
+  const armSegLen = 0.10;  // upper arm and forearm each 0.10 units
+
+  // Left arm: shoulder at (cx - 0.10, shoulderY), elbow extends rightward then wrist further
+  const leftShoulderX = cx - shoulderHalf;
+  const leftElbowX = leftShoulderX + armSegLen;
+  const leftElbowY = shoulderY + 0.02;
+  // wrist extends from elbow at elbowExtensionDeg angle from elbow perspective
+  const leftWristX = leftElbowX + armSegLen * Math.cos(extRad - Math.PI);
+  const leftWristY = leftElbowY + armSegLen * Math.sin(extRad - Math.PI) * 0.1;
+
+  const rightShoulderX = cx + shoulderHalf;
+  const rightElbowX = rightShoulderX - armSegLen;
+  const rightElbowY = shoulderY + 0.02;
+  const rightWristX = rightElbowX - armSegLen * Math.cos(extRad - Math.PI);
+  const rightWristY = rightElbowY + armSegLen * Math.sin(extRad - Math.PI) * 0.1;
+
+  pose[IDX.leftElbow]  = makeLandmark(leftElbowX,  leftElbowY,  visibility);
+  pose[IDX.rightElbow] = makeLandmark(rightElbowX, rightElbowY, visibility);
+  pose[IDX.leftWrist]  = makeLandmark(leftWristX,  leftWristY,  visibility);
+  pose[IDX.rightWrist] = makeLandmark(rightWristX, rightWristY, visibility);
+
+  pose[IDX.leftHip]  = makeLandmark(cx - 0.07, hipY, visibility);
+  pose[IDX.rightHip] = makeLandmark(cx + 0.07, hipY, visibility);
+
+  pose[IDX.leftKnee]  = makeLandmark(cx - 0.07, 0.72, visibility);
+  pose[IDX.rightKnee] = makeLandmark(cx + 0.07, 0.72, visibility);
+
+  pose[IDX.leftAnkle]  = makeLandmark(cx - 0.07, ankleY, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(cx + 0.07, ankleY, visibility);
+
+  pose[IDX.leftHeel]      = makeLandmark(cx - 0.075, ankleY + 0.01, visibility);
+  pose[IDX.rightHeel]     = makeLandmark(cx + 0.075, ankleY + 0.01, visibility);
+  pose[IDX.leftFootIndex] = makeLandmark(cx - 0.065, ankleY,        visibility);
+  pose[IDX.rightFootIndex]= makeLandmark(cx + 0.065, ankleY,        visibility);
+
+  return pose;
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// LATERAL BAND WALK â€” front camera, standing, hip shifts laterally
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+/**
+ * Build a lateral-band-walk pose from intent.
+ * hipXDisplacement: normalized lateral shift relative to center.
+ *   0 = centered (calibration position)
+ *   > 0 = shifted right
+ *   < 0 = shifted left
+ * The engine computes displacement relative to the baseline hipMid.x captured at calibration.
+ * So at calibration we put hipMid.x = 0.50, and during stepping hipMid.x shifts by
+ * hipXDisplacement Ã— shoulderWidth (engine normalizes by shoulderWidth).
+ */
+export function buildLateralBandWalkPose(intent: LateralBandWalkPoseIntent): PoseLandmarks {
+  const {
+    hipXDisplacement,
+    trunkLeanDeg = 0,
+    hipDropRatio = 0,
+    bodyHeight = 0.70,
+    isNearEdge = false,
+    visibility = 0.95,
+    isNull,
+    walkingAnkleRaise = 0, // BUG-LBW-11: 0 = both feet on floor (default)
+  } = intent;
+
+  if (isNull) {
+    const pose = emptyPose();
+    for (let i = 0; i < LM_COUNT; i++) pose[i] = makeLandmark(0.5, 0.5, 0);
+    return pose;
+  }
+
+  const pose = emptyPose();
+  const cx = 0.50;
+  const shoulderWidth = 0.18;   // shoulderWidth used in baseline capture
+  const shoulderHalf = shoulderWidth / 2;
+  // Scale body to match bodyHeight â€” use bodyHeight to set the ankle-shoulder span
+  // bodyHeight = ankleY - shoulderY, so shoulderY = ankleY - bodyHeight
+  const ankleY = 0.92;
+  const shoulderY = ankleY - bodyHeight;
+  const hipY = shoulderY + bodyHeight * 0.38;
+  const torsoHeight = hipY - shoulderY;
+
+  // Shift hips laterally: hipXDisplacement is normalized by shoulderWidth
+  // engine computes: displacement = (currentHipX - baseline.hipMid.x) / baseline.shoulderWidth
+  // So if baseline.hipMid.x = cx and baseline.shoulderWidth = shoulderWidth:
+  // hipXDisplacement = (cx + shift - cx) / shoulderWidth âŸ¹ shift = hipXDisplacement * shoulderWidth
+  // isNearEdge=true: place hip X very near the left frame edge (< 0.08) to trigger steps-not-tracked
+  const hipShift = isNearEdge ? (0.04 - cx) : (hipXDisplacement * shoulderWidth);
+
+  // Trunk lean: shift shoulders slightly opposite to hip shift for lean simulation
+  const leanRad = (trunkLeanDeg * Math.PI) / 180;
+  const shoulderShift = Math.sin(leanRad) * torsoHeight;
+
+  // Hip drop: the stepping-side hip drops (Y increases = lower in frame).
+  // detectHipDrop checks: steppingHipY - baselineHipY > threshold * torsoHeight.
+  // Stepping right (hipShift > 0): right hip drops (Y increases).
+  // Stepping left (hipShift < 0): left hip drops (Y increases).
+  const hipDropDelta = hipDropRatio * torsoHeight;
+  const leftHipYAdj  = hipShift < 0 ? hipY + hipDropDelta : hipY;
+  const rightHipYAdj = hipShift >= 0 ? hipY + hipDropDelta : hipY;
+
+  pose[IDX.nose]       = makeLandmark(cx + shoulderShift, shoulderY - 0.10, visibility);
+  pose[IDX.leftEye]    = makeLandmark(cx + shoulderShift - 0.02, shoulderY - 0.11, visibility);
+  pose[IDX.rightEye]   = makeLandmark(cx + shoulderShift + 0.02, shoulderY - 0.11, visibility);
+  pose[IDX.leftEar]    = makeLandmark(cx + shoulderShift - 0.03, shoulderY - 0.10, visibility);
+  pose[IDX.rightEar]   = makeLandmark(cx + shoulderShift + 0.03, shoulderY - 0.10, visibility);
+
+  pose[IDX.leftShoulder]  = makeLandmark(cx - shoulderHalf + shoulderShift, shoulderY, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(cx + shoulderHalf + shoulderShift, shoulderY, visibility);
+
+  // Wrists near hips (calibration: within Â±0.08 of hipMidY)
+  const hipMidY = (leftHipYAdj + rightHipYAdj) / 2;
+  pose[IDX.leftElbow]  = makeLandmark(cx - shoulderHalf + hipShift * 0.3, hipMidY - 0.04, visibility);
+  pose[IDX.rightElbow] = makeLandmark(cx + shoulderHalf + hipShift * 0.3, hipMidY - 0.04, visibility);
+  pose[IDX.leftWrist]  = makeLandmark(cx - shoulderHalf * 0.7 + hipShift * 0.3, hipMidY + 0.02, visibility);
+  pose[IDX.rightWrist] = makeLandmark(cx + shoulderHalf * 0.7 + hipShift * 0.3, hipMidY + 0.02, visibility);
+
+  pose[IDX.leftHip]  = makeLandmark(cx - shoulderHalf * 0.6 + hipShift, leftHipYAdj,  visibility);
+  pose[IDX.rightHip] = makeLandmark(cx + shoulderHalf * 0.6 + hipShift, rightHipYAdj, visibility);
+
+  pose[IDX.leftKnee]  = makeLandmark(cx - shoulderHalf * 0.6 + hipShift * 0.5, 0.72, visibility);
+  pose[IDX.rightKnee] = makeLandmark(cx + shoulderHalf * 0.6 + hipShift * 0.5, 0.72, visibility);
+
+  // BUG-LBW-11: walkingAnkleRaise lifts the right ankle to simulate forward walking.
+  // Raising the ankle = decreasing Y (moves up in frame). Both feet on floor â†’ raise = 0.
+  pose[IDX.leftAnkle]  = makeLandmark(cx - shoulderHalf * 0.6, ankleY, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(cx + shoulderHalf * 0.6, ankleY - walkingAnkleRaise, visibility);
+
+  pose[IDX.leftHeel]      = makeLandmark(cx - shoulderHalf * 0.6 - 0.005, ankleY + 0.01, visibility);
+  pose[IDX.rightHeel]     = makeLandmark(cx + shoulderHalf * 0.6 + 0.005, ankleY + 0.01, visibility);
+  pose[IDX.leftFootIndex] = makeLandmark(cx - shoulderHalf * 0.6 + 0.02,  ankleY,        visibility);
+  pose[IDX.rightFootIndex]= makeLandmark(cx + shoulderHalf * 0.6 - 0.02,  ankleY,        visibility);
+
+  return pose;
+}
+
+// â”€â”€â”€ Pistol Squat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Front-facing unilateral squat. Standing leg bends deeply; floating leg
+// extends forward with ankle lifted off the ground.
+//
+// bodyHeight: ankle-to-shoulder Y span (0.45â€“0.92 for valid distance gate).
+//   Default 0.70 (medium distance). Set < 0.45 to simulate too-far, > 0.92 for too-close.
+// valgusRatio: 0 = natural, 0.25+ = standing knee collapsed inward toward ankle.
+//   At high flex, the knee swings outward; valgusRatio pulls it back toward the
+//   standing ankle X, simulating knee valgus. The engine detects valgus when
+//   the standing knee crosses inward past the ankle's lateral position.
+export function buildPistolSquatPose(intent: import('./types').PistolSquatPoseIntent): PoseLandmarks {
+  const {
+    kneeFlexionDeg,
+    standingLeg = 'left',
+    floatingLegFlexDeg = 20,
+    armsForward = true,
+    trunkLeanDeg: trunkLean = 0,
+    valgusRatio = 0,
+    bodyHeight = 0.70,
+    noise = 0,
+    seed = 1,
+    visibility = 0.95,
+    occludedIndices,
+  } = intent;
+
+  const pose = emptyPose();
+
+  // Scale the body geometry to honour the bodyHeight intent.
+  // bodyHeight = ankle-to-shoulder vertical span. We place ankles at a fixed Y
+  // and derive shoulder position from bodyHeight (like broad-jump does).
+  const cx = 0.50;
+  const ankleY = 0.92;
+  // Natural body height at L=0.22 with 0Â° flex: legLen=0.44, torso=0.18 â†’ spanâ‰ˆ0.62.
+  // We scale the effective leg length proportionally so bodyHeight is respected.
+  const naturalBodyHeight = 0.62;
+  const scale = bodyHeight / naturalBodyHeight;
+  const effectiveL = L * scale;
+  const effectiveTorso = 0.18 * scale;
+
+  const shoulderWidth = 0.16;
+  const shoulderHalf = shoulderWidth / 2;
+  // Narrow foot placement â€” one foot planted, the other extended
+  const ankleHalf = shoulderWidth * 0.40;
+  const ankleXLeft = cx - ankleHalf;
+  const ankleXRight = cx + ankleHalf;
+
+  // Use a scaled legGeometry inline for pistol squat
+  function scaledLegGeometry(ankleXp: number, ankleYp: number, flexDeg: number, sign: -1 | 1) {
+    const halfRad = (flexDeg / 2) * Math.PI / 180;
+    const baseLen = 2 * effectiveL * Math.cos(halfRad);
+    const offset = effectiveL * Math.sin(halfRad);
+    const hipXp = ankleXp;
+    const hipYp = ankleYp - baseLen;
+    const midYp = ankleYp - baseLen / 2;
+    const kneeXp = ankleXp + sign * offset;
+    const kneeYp = midYp;
+    return { kneeX: kneeXp, kneeY: kneeYp, hipX: hipXp, hipY: hipYp };
+  }
+
+  const standingFlex = kneeFlexionDeg;
+  const floatingFlex = floatingLegFlexDeg;
+
+  const standingSign: -1 | 1 = standingLeg === 'left' ? -1 : 1;
+  const floatingSign: -1 | 1 = standingLeg === 'left' ? 1 : -1;
+
+  const standingAnkleX = standingLeg === 'left' ? ankleXLeft : ankleXRight;
+  const floatingAnkleX = standingLeg === 'left' ? ankleXRight : ankleXLeft;
+
+  // Standing ankle stays on the ground; floating ankle is lifted proportionally
+  // to the standing knee flex. At 0Â° (calibration/standing), both ankles are
+  // at the same Y so the feetOnGround calibration gate passes.
+  const standingAnkleY = ankleY;
+  const floatingAnkleY = standingAnkleY - (standingFlex / 90) * bodyHeight * 0.08;
+
+  const standingLeg_ = scaledLegGeometry(standingAnkleX, standingAnkleY, standingFlex, standingSign);
+  const floatingLeg_ = scaledLegGeometry(floatingAnkleX, floatingAnkleY, floatingFlex, floatingSign);
+
+  // Valgus: place the standing knee INWARD of the standing ankle.
+  // When valgusRatio > 0, the knee is shifted past the ankle's lateral position
+  // toward the body midline. This creates a negative outreach (ankle.x - knee.x
+  // for left = outward) which the engine reliably detects as valgus.
+  // valgusRatio=0 â†’ natural position; valgusRatio=0.25 â†’ knee 25% of ankleHalf inward of ankle.
+  const naturalStandingKneeX = standingLeg_.kneeX;
+  // For left leg (standingSign=-1): move rightward (inward) = increase X.
+  // For right leg (standingSign=+1): move leftward (inward) = decrease X.
+  const adjStandingKneeX = valgusRatio > 0
+    ? standingAnkleX - standingSign * valgusRatio * ankleHalf  // place inward of ankle
+    : naturalStandingKneeX;
+
+  const adjLeftKneeX = standingLeg === 'left' ? adjStandingKneeX : floatingLeg_.kneeX;
+  const adjRightKneeX = standingLeg === 'right' ? adjStandingKneeX : floatingLeg_.kneeX;
+
+  // Hip midpoint: average of both hips
+  const leftHipY = standingLeg === 'left' ? standingLeg_.hipY : floatingLeg_.hipY;
+  const rightHipY = standingLeg === 'right' ? standingLeg_.hipY : floatingLeg_.hipY;
+  const leftHipX = standingLeg === 'left' ? standingLeg_.hipX : floatingLeg_.hipX;
+  const rightHipX = standingLeg === 'right' ? standingLeg_.hipX : floatingLeg_.hipX;
+
+  const hipMidX = (leftHipX + rightHipX) / 2;
+  const hipMidY = (leftHipY + rightHipY) / 2;
+
+  const leanRad = (trunkLean * Math.PI) / 180;
+  const shoulderY = hipMidY - effectiveTorso * Math.cos(leanRad);
+  const shoulderXShift = Math.sin(leanRad) * effectiveTorso;
+
+  const headY = shoulderY - 0.10 * scale;
+
+  pose[IDX.nose] = makeLandmark(hipMidX + shoulderXShift, headY, visibility);
+  pose[IDX.leftEye] = makeLandmark(hipMidX - 0.02 + shoulderXShift, headY - 0.01, visibility);
+  pose[IDX.rightEye] = makeLandmark(hipMidX + 0.02 + shoulderXShift, headY - 0.01, visibility);
+  pose[IDX.leftEar] = makeLandmark(hipMidX - 0.035 + shoulderXShift, headY, visibility);
+  pose[IDX.rightEar] = makeLandmark(hipMidX + 0.035 + shoulderXShift, headY, visibility);
+
+  pose[IDX.leftShoulder] = makeLandmark(hipMidX - shoulderHalf + shoulderXShift, shoulderY, visibility);
+  pose[IDX.rightShoulder] = makeLandmark(hipMidX + shoulderHalf + shoulderXShift, shoulderY, visibility);
+
+  // Arms: forward for counterbalance (pistol squat) or at sides
+  if (armsForward) {
+    pose[IDX.leftElbow] = makeLandmark(hipMidX - shoulderHalf - 0.01, shoulderY + 0.05, visibility);
+    pose[IDX.rightElbow] = makeLandmark(hipMidX + shoulderHalf + 0.01, shoulderY + 0.05, visibility);
+    pose[IDX.leftWrist] = makeLandmark(hipMidX - shoulderHalf - 0.01, shoulderY + 0.10, visibility);
+    pose[IDX.rightWrist] = makeLandmark(hipMidX + shoulderHalf + 0.01, shoulderY + 0.10, visibility);
+  } else {
+    pose[IDX.leftElbow] = makeLandmark(hipMidX - shoulderHalf - 0.01, shoulderY + 0.10, visibility);
+    pose[IDX.rightElbow] = makeLandmark(hipMidX + shoulderHalf + 0.01, shoulderY + 0.10, visibility);
+    pose[IDX.leftWrist] = makeLandmark(hipMidX - shoulderHalf - 0.01, shoulderY + 0.18, visibility);
+    pose[IDX.rightWrist] = makeLandmark(hipMidX + shoulderHalf + 0.01, shoulderY + 0.18, visibility);
+  }
+
+  pose[IDX.leftHip] = makeLandmark(leftHipX, leftHipY, visibility);
+  pose[IDX.rightHip] = makeLandmark(rightHipX, rightHipY, visibility);
+
+  pose[IDX.leftKnee] = makeLandmark(adjLeftKneeX, standingLeg === 'left' ? standingLeg_.kneeY : floatingLeg_.kneeY, visibility);
+  pose[IDX.rightKnee] = makeLandmark(adjRightKneeX, standingLeg === 'right' ? standingLeg_.kneeY : floatingLeg_.kneeY, visibility);
+
+  pose[IDX.leftAnkle] = makeLandmark(ankleXLeft, standingLeg === 'left' ? standingAnkleY : floatingAnkleY, visibility);
+  pose[IDX.rightAnkle] = makeLandmark(ankleXRight, standingLeg === 'right' ? standingAnkleY : floatingAnkleY, visibility);
+
+  const leftAY = standingLeg === 'left' ? standingAnkleY : floatingAnkleY;
+  const rightAY = standingLeg === 'right' ? standingAnkleY : floatingAnkleY;
+  pose[IDX.leftHeel] = makeLandmark(ankleXLeft - 0.005, leftAY + 0.01, visibility);
+  pose[IDX.rightHeel] = makeLandmark(ankleXRight + 0.005, rightAY + 0.01, visibility);
+  pose[IDX.leftFootIndex] = makeLandmark(ankleXLeft + 0.02, leftAY, visibility);
+  pose[IDX.rightFootIndex] = makeLandmark(ankleXRight - 0.02, rightAY, visibility);
+
+  applyNoise(pose, noise, seed);
+  applyOcclusion(pose, occludedIndices);
+  return pose;
+}
+
+// â”€â”€â”€ Nordic Curl â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Side-camera kneeling geometry. Person faces camera-right (right side visible).
+// As trunkLeanDeg increases, the shoulder moves forward (horizontally) while
+// the hip and knee remain fixed.
+export function buildNordicCurlPose(intent: import('./types').NordicCurlPoseIntent): import('@/modules/pose/types').PoseLandmarks {
+  const bh = intent.bodyHeight ?? 0.60;
+  const frameTopY = 0.5 - bh / 2; // center the body vertically
+  const leanRad = (intent.trunkLeanDeg * Math.PI) / 180;
+
+  // Side profile: use RIGHT side landmarks (left side has low visibility)
+  // Person kneeling: ankle on floor, knee above ankle, hip above knee, shoulder above hip
+  const torsoLen = bh * 0.40;  // torso is 40% of visible body height
+  const thighLen = bh * 0.30;  // thigh (knee to hip) is 30%
+  const shankLen = bh * 0.30;  // shin (ankle to knee)
+
+  const ankleY = frameTopY + bh;
+  const ankleX = 0.50;
+  const kneeX = ankleX;
+  const kneeY = ankleY - shankLen;
+  const hipX = kneeX;
+  const hipY = kneeY - thighLen;
+  // Shoulder moves forward with trunk lean:
+  const shoulderX = hipX + torsoLen * Math.sin(leanRad);
+  const shoulderY = hipY - torsoLen * Math.cos(leanRad);
+
+  const lms = emptyPose();
+  const vis = intent.visibility ?? 0.95;
+
+  // Right side (camera-facing):
+  lms[IDX.rightShoulder] = makeLandmark(shoulderX, shoulderY, vis);
+  lms[IDX.rightHip] = makeLandmark(hipX, hipY, vis);
+  lms[IDX.rightKnee] = makeLandmark(kneeX, kneeY, vis);
+  lms[IDX.rightAnkle] = makeLandmark(ankleX, ankleY, vis);
+  // Left side (away from camera â€” low visibility):
+  lms[IDX.leftShoulder] = makeLandmark(shoulderX + 0.05, shoulderY, 0.2);
+  lms[IDX.leftHip] = makeLandmark(hipX + 0.05, hipY, 0.2);
+  lms[IDX.leftKnee] = makeLandmark(kneeX + 0.05, kneeY, 0.2);
+  lms[IDX.leftAnkle] = makeLandmark(ankleX + 0.05, ankleY, 0.2);
+  // Nose at shoulder level for body height detection:
+  lms[IDX.nose] = makeLandmark(shoulderX, shoulderY - 0.05, vis);
+
+  applyNoise(lms, intent.noise ?? 0, intent.seed ?? 0);
+  applyOcclusion(lms, intent.occludedIndices);
+  return lms;
+}
+
+// â”€â”€â”€ REAL: Clamshell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Person lying on their side. Camera sees them from the side.
+// Body axis is HORIZONTAL in frame; both hips at different Y positions.
+// Top knee rises upward (Y decreasing) as abductionFrac increases.
+export function buildClamshellPose(intent: import('./types').ClamshellPoseIntent): import('@/modules/pose/types').PoseLandmarks {
+  const sideDown = intent.sideDown ?? 'left';
+  const abducFrac = Math.max(0, intent.abductionFrac);
+  const vis = intent.visibility ?? 0.95;
+
+  // Body is horizontal. Place at center of frame.
+  const centerX = 0.50;
+  const centerY = 0.50;
+
+  // Hip positions (stacked â€” small vertical separation = hipThickness)
+  const hipThickness = 0.08;   // how far apart the two hips are vertically
+  const bottomHipY = centerY + hipThickness / 2;
+  const topHipY = centerY - hipThickness / 2;
+  const hipX = centerX;
+
+  // Thigh direction: knees bend forward
+  const kneeBend = intent.kneeBendDeg ?? 45;
+  const thighLen = 0.15;  // normalized units
+  const shinLen = 0.12;
+  const kneeBendRad = (kneeBend * Math.PI) / 180;
+
+  // Bottom leg (on floor):
+  const bottomKneeX = hipX + thighLen * Math.cos(kneeBendRad / 2);
+  const bottomKneeY = bottomHipY + thighLen * Math.sin(kneeBendRad / 2) * 0.3;
+  const bottomAnkleX = bottomKneeX + shinLen * Math.cos(kneeBendRad);
+  const bottomAnkleY = bottomKneeY + shinLen * Math.sin(kneeBendRad) * 0.3;
+
+  // Top leg at rest (closed):
+  // When closed: top knee Y â‰ˆ bottom knee Y (stacked). kneeGapBaseline = small positive.
+  const kneeSeparation = hipThickness * 0.80;  // small natural separation when closed
+  const closedTopKneeY = bottomKneeY - kneeSeparation;
+  // When open: top knee rises by abductionFrac * hipThickness
+  const topKneeRise = abducFrac * hipThickness;
+  const topKneeY = closedTopKneeY - topKneeRise;
+  const topKneeX = bottomKneeX;  // X stays roughly same
+
+  // Top ankle tracks with knee
+  const topAnkleX = bottomAnkleX;
+  const topAnkleY = bottomAnkleY - kneeSeparation - topKneeRise;
+
+  // Build 33-landmark array
+  const pose = emptyPose();
+
+  if (sideDown === 'left') {
+    // LEFT side is on floor (bottom)
+    pose[IDX.leftHip]    = makeLandmark(hipX, bottomHipY, vis);
+    pose[IDX.rightHip]   = makeLandmark(hipX, topHipY, vis);
+    pose[IDX.leftKnee]   = makeLandmark(bottomKneeX, bottomKneeY, vis);
+    pose[IDX.rightKnee]  = makeLandmark(topKneeX, topKneeY, vis);
+    pose[IDX.leftAnkle]  = makeLandmark(bottomAnkleX, bottomAnkleY, vis);
+    pose[IDX.rightAnkle] = makeLandmark(topAnkleX, topAnkleY, vis);
+  } else {
+    // RIGHT side is on floor (bottom)
+    pose[IDX.rightHip]   = makeLandmark(hipX, bottomHipY, vis);
+    pose[IDX.leftHip]    = makeLandmark(hipX, topHipY, vis);
+    pose[IDX.rightKnee]  = makeLandmark(bottomKneeX, bottomKneeY, vis);
+    pose[IDX.leftKnee]   = makeLandmark(topKneeX, topKneeY, vis);
+    pose[IDX.rightAnkle] = makeLandmark(bottomAnkleX, bottomAnkleY, vis);
+    pose[IDX.leftAnkle]  = makeLandmark(topAnkleX, topAnkleY, vis);
+  }
+
+  // Shoulder (horizontal, beside hip):
+  const shoulderX = hipX - 0.25;  // shoulders to the left of hips
+  pose[IDX.leftShoulder]  = makeLandmark(shoulderX, bottomHipY + 0.02, vis * 0.8);
+  pose[IDX.rightShoulder] = makeLandmark(shoulderX, topHipY - 0.02, vis * 0.8);
+  pose[IDX.nose] = makeLandmark(shoulderX - 0.05, centerY, vis * 0.6);
+
+  applyNoise(pose, intent.noise ?? 0, intent.seed ?? 0);
+  applyOcclusion(pose, intent.occludedIndices);
   return pose;
 }

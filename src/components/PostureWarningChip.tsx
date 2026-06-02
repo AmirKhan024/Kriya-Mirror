@@ -102,6 +102,73 @@ const STRINGS: Record<WarningType, { text: string; tone: 'amber' | 'danger' }> =
   'shallow-spine-rom': { text: 'Arch and round your back through a fuller range', tone: 'amber' },
   // Downward Dog: arms bending (recoverable — straighten them)
   'arms-not-straight': { text: 'Straighten your arms — press the floor away', tone: 'amber' },
+  // ── New exercises (Bilal's round 2) ──
+  // Kettlebell Swing
+  'squat-pattern': { text: 'Drive from your hips — this is a hinge, not a squat', tone: 'amber' },
+  'arm-lift': { text: 'Let your arms swing passively — power comes from your hips', tone: 'amber' },
+  'incomplete-extension': { text: 'Snap your hips fully — stand tall and squeeze your glutes at the top', tone: 'amber' },
+  // Burpee
+  'no-jump': { text: 'Finish with a jump — explode up at the end', tone: 'amber' },
+  'incomplete-plank': { text: 'Get into full plank — extend your legs before pushing back up', tone: 'amber' },
+  // Box Jump
+  'stiff-landing': { text: 'Bend your knees on landing — absorb the impact softly', tone: 'danger' },
+  'no-loading': { text: 'Dip first — bend your knees to load before jumping', tone: 'amber' },
+  'incomplete-jump': { text: 'Jump higher — get full extension off the ground', tone: 'amber' },
+  // Mountain Climber
+  'incomplete-drive': { text: 'Drive your knee all the way to your chest for a full rep', tone: 'amber' },
+  // Lateral Raise
+  'above-parallel': { text: 'Lower your arms slightly — raise only to shoulder height', tone: 'amber' },
+  // Star Jump
+  'incomplete-star-jump': { text: 'Raise your arms fully overhead — reach all the way up', tone: 'amber' },
+  // Glute Bridge
+  'incomplete-bridge': { text: 'Drive your hips higher — squeeze your glutes at the top', tone: 'amber' },
+  // Overhead Tricep Extension
+  'incomplete-tricep-extension': { text: 'Lower further — bring the weight deeper behind your head', tone: 'amber' },
+  // Chair Dip
+  'incomplete-dip': { text: 'Dip lower — bend your elbows to 90°', tone: 'amber' },
+  // Dead Bug
+  'hip-lift-off': { text: 'Press your lower back into the mat — hips lifting', tone: 'danger' },
+  'incomplete-dead-bug': { text: 'Extend further — straighten your leg closer to the floor', tone: 'amber' },
+  // Inchworm
+  'incomplete-inchworm': { text: 'Fold deeper — reach your hands closer to the floor', tone: 'amber' },
+  // Jump Squat
+  'incomplete-jump-squat': { text: 'Jump higher — push through the full range', tone: 'amber' },
+  // Shrug
+  'incomplete-shrug': { text: 'Shrug higher — elevate your shoulders fully', tone: 'amber' },
+  // Superman
+  'incomplete-superman': { text: 'Lift higher — chest and legs off the floor', tone: 'amber' },
+  // Bird-Dog
+  'incomplete-bird-dog': { text: 'Extend further — straighten your arm and leg fully', tone: 'amber' },
+  // Step-Up
+  'incomplete-step-up': { text: 'Drive higher — push all the way up onto the step', tone: 'amber' },
+  // Walking Lunge
+  'incomplete-walking-lunge': { text: 'Lower further — front thigh closer to parallel', tone: 'amber' },
+  // Reverse Fly
+  'incomplete-reverse-fly': { text: 'Raise higher — lift both arms to shoulder height', tone: 'amber' },
+  // Goblet Squat
+  'goblet-elbows-collapsing': { text: 'Spread elbows apart — push them outward', tone: 'amber' },
+  'incomplete-goblet-squat': { text: 'Squat deeper — reach hip level', tone: 'amber' },
+  // Donkey Kick
+  'incomplete-donkey-kick': { text: 'Kick higher — drive heel toward the ceiling', tone: 'amber' },
+  // Fire Hydrant
+  'incomplete-fire-hydrant': { text: 'Lift higher — raise your knee out to the side', tone: 'amber' },
+  // Curtsy Lunge
+  'incomplete-curtsy-lunge': { text: 'Lower deeper — rear knee closer to the floor', tone: 'amber' },
+  'hip-rotation-curtsy': { text: "Keep hips square — don't let the hip swing out", tone: 'amber' },
+  'trunk-lean': { text: 'Stand taller — keep your torso upright', tone: 'amber' },
+  'knee-valgus': { text: "Knees out — don't let them cave in", tone: 'danger' },
+  // Pallof Press
+  'incomplete-pallof-press': { text: 'Press fully — arms straight out from chest', tone: 'amber' },
+  'torso-rotation-pallof': { text: 'Resist the pull — keep your torso facing forward', tone: 'danger' },
+  // Lateral Band Walk
+  'steps-not-tracked': { text: 'Stay in frame — take smaller steps sideways', tone: 'amber' },
+  'hip-drop': { text: "Level your hips — don't let them drop to the side", tone: 'amber' },
+  // Pistol Squat
+  'incomplete-pistol-squat': { text: 'Go deeper on the squat', tone: 'amber' },
+  // Nordic Curl
+  'incomplete-nordic-curl': { text: 'Lower further for a full rep', tone: 'amber' },
+  // Clamshell
+  'incomplete-clamshell': { text: 'Open your knee higher', tone: 'amber' },
   // Strength exercises (integrated from Bilal's repo)
   'rounded-back': { text: 'Keep your back straight — don\'t round', tone: 'danger' },
   'hips-shooting-up': { text: 'Hips and shoulders rise together', tone: 'danger' },
@@ -181,6 +248,46 @@ const URGENT_OVERRIDE: Record<WarningType, string> = {
   'chest-not-lifted': 'Lift your chest higher — press through your hands',
   'shallow-spine-rom': 'Move bigger — really arch and round your back each rep',
   'arms-not-straight': 'Stop — arms bending. Straighten them and press the floor away',
+  // New exercises (Bilal's round 2)
+  'squat-pattern': 'Stop — squatting instead of hinging. Drive from your hips',
+  'arm-lift': 'Stop — arms doing the work. Let hips generate the power',
+  'incomplete-extension': 'Stop — not locking out. Snap your hips fully at the top',
+  'no-jump': 'Stop — missing the jump. Explode up at the end of every burpee',
+  'incomplete-plank': 'Stop — not reaching full plank. Extend your legs before pushing up',
+  'stiff-landing': 'Stop — stiff landing every rep. Bend your knees to absorb the impact',
+  'no-loading': 'Stop — not loading first. Dip your knees before every jump',
+  'incomplete-jump': 'Stop — jumps too short. Get full extension off the ground',
+  'incomplete-drive': 'Stop — knee not reaching chest. Drive it all the way in',
+  'above-parallel': 'Stop — arms going overhead. Halt at shoulder height',
+  'incomplete-star-jump': 'Stop — arms not reaching overhead. Raise them all the way up',
+  'incomplete-bridge': 'Stop — hips not high enough. Drive up and squeeze your glutes',
+  'incomplete-tricep-extension': 'Stop — not going deep enough. Lower further behind your head',
+  'incomplete-dip': 'Stop — not dipping to 90°. Bend your elbows more on every rep',
+  'hip-lift-off': 'Stop — lower back lifting off the mat. Press it down and reset',
+  'incomplete-dead-bug': 'Stop — limbs too high. Extend your leg closer to the floor',
+  'incomplete-inchworm': 'Stop — not folding enough. Reach your hands further down',
+  'incomplete-jump-squat': 'Stop — jumps too short. Push through a bigger range',
+  'incomplete-shrug': 'Stop — shrugs too shallow. Elevate your shoulders all the way up',
+  'incomplete-superman': 'Stop — not lifting enough. Get chest and legs fully off the floor',
+  'incomplete-bird-dog': 'Stop — limbs not extending. Straighten arm and leg fully',
+  'incomplete-step-up': 'Stop — not stepping all the way up. Push to full height',
+  'incomplete-walking-lunge': 'Stop — lunges too shallow. Lower your back knee further',
+  'incomplete-reverse-fly': 'Stop — arms too low. Raise both arms to shoulder height',
+  'goblet-elbows-collapsing': 'Stop — elbows collapsing inward. Push them out on every rep',
+  'incomplete-goblet-squat': 'Stop — squats too shallow. Reach hip depth every rep',
+  'incomplete-donkey-kick': 'Stop — kick too low. Drive your heel all the way up',
+  'incomplete-fire-hydrant': 'Stop — not abducting enough. Raise your knee higher out to the side',
+  'incomplete-curtsy-lunge': 'Stop — lunges too shallow. Lower your rear knee closer to the floor',
+  'hip-rotation-curtsy': 'Stop — hip swinging out. Keep both hips square',
+  'trunk-lean': 'Stop — leaning too much. Keep your torso tall and upright',
+  'knee-valgus': 'Stop — knees caving in. Drive them outward on every rep',
+  'incomplete-pallof-press': 'Stop — not fully extending. Press arms all the way out from chest',
+  'torso-rotation-pallof': 'Stop — torso rotating. Resist the band and stay square',
+  'steps-not-tracked': 'Stop — stepping out of frame. Take smaller, controlled steps',
+  'hip-drop': 'Stop — hips dropping. Keep them level throughout the walk',
+  'incomplete-pistol-squat': 'Stop — not reaching depth. Go deeper on each rep',
+  'incomplete-nordic-curl': 'Stop — not lowering far enough. Control the descent further',
+  'incomplete-clamshell': 'Stop — not opening enough. Lift your knee higher every rep',
   // Strength exercises (integrated from Bilal's repo)
   'rounded-back': 'Stop — back rounding every rep. Reset and brace your core',
   'hips-shooting-up': 'Stop — hips shooting up. Drive through your legs equally',
