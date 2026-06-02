@@ -362,7 +362,6 @@ const WARNING_SPEECH: Record<WarningType, string> = {
   'incomplete-jump': 'Jump higher. Get full extension off the ground.',
   'incomplete-drive': 'Drive your knee all the way to your chest for a full rep.',
   'above-parallel': 'Lower your arms slightly. Raise only to shoulder height.',
-  'incomplete-raise': 'Raise higher. Bring your arms to shoulder level.',
   'incomplete-star-jump': 'Raise your arms fully overhead. Reach all the way up.',
   'incomplete-bridge': 'Drive your hips higher. Squeeze your glutes at the top.',
   'incomplete-tricep-extension': 'Lower further. Bring the weight deeper behind your head.',

@@ -33,9 +33,15 @@ export type DebugCategory =
   | 'HOLD'
   | 'TICK'
   | 'BROKEN'
-  | 'TIMER';   // 2026-05-25 round 3: plank counter freeze/resume during sustained bad form
+  | 'TIMER'   // 2026-05-25 round 3: plank counter freeze/resume during sustained bad form
+  // Accept any other debug category too (new exercises add their own); known
+  // categories above still autocomplete.
+  | (string & {});
 
-export type EngineTag = 'SQUAT' | 'PLANK' | 'PUSHUP' | 'LUNGE' | 'TANDEM' | 'CURL' | 'SLS' | 'CHAIR' | 'RAISE' | 'TREE' | 'WARRIOR' | 'WARRIOR1' | 'WARRIOR3' | 'MOUNTAIN' | 'CALF' | 'JACKS' | 'KNEES' | 'FRONT' | 'CIRCLES' | 'GODDESS' | 'TRIANGLE' | 'WALLSIT' | 'LEGRAISE' | 'SIDEBEND' | 'REVLUNGE' | 'LATERALLUNGE' | 'SIDEPLANK' | 'BOAT' | 'SIT2STAND' | 'FOLD' | 'DOG' | 'COBRA' | 'MARCH' | 'SFOLD' | 'STAR' | 'FIG4' | 'GATE' | 'COSSACK' | 'LEGSWING' | 'CATCOW' | 'DEADLIFT' | 'PULLUP' | 'PRESS' | 'RDL' | 'ROW';
+export type EngineTag = 'SQUAT' | 'PLANK' | 'PUSHUP' | 'LUNGE' | 'TANDEM' | 'CURL' | 'SLS' | 'CHAIR' | 'RAISE' | 'TREE' | 'WARRIOR' | 'WARRIOR1' | 'WARRIOR3' | 'MOUNTAIN' | 'CALF' | 'JACKS' | 'KNEES' | 'FRONT' | 'CIRCLES' | 'GODDESS' | 'TRIANGLE' | 'WALLSIT' | 'LEGRAISE' | 'SIDEBEND' | 'REVLUNGE' | 'LATERALLUNGE' | 'SIDEPLANK' | 'BOAT' | 'SIT2STAND' | 'FOLD' | 'DOG' | 'COBRA' | 'MARCH' | 'SFOLD' | 'STAR' | 'FIG4' | 'GATE' | 'COSSACK' | 'LEGSWING' | 'CATCOW' | 'DEADLIFT' | 'PULLUP' | 'PRESS' | 'RDL' | 'ROW'
+  // Accept any other debug label too, so adding a new exercise never breaks the
+  // build over a missing tag. Known tags above still autocomplete.
+  | (string & {});
 
 const LEVEL_RANK: Record<DebugLevel, number> = { quiet: 0, info: 1, verbose: 2 };
 

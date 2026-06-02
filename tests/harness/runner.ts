@@ -2669,6 +2669,8 @@ export function runHammerCurlSession(frames: Frame[]): HammerCurlRunResult {
     calibrationConfirmedAtMs,
     frameMetricsSamples,
   };
+}
+
 export interface MCRepRecord extends MountainClimberRepEvent {
   index: number;
   atMs: number;
