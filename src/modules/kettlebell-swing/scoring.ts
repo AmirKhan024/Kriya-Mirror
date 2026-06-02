@@ -1,0 +1,33 @@
+/**
+ * Kettlebell Swing scoring.
+ *
+ * Completion keyed to peak hip-hinge angle (how deep the hinge reached).
+ * A full KB swing hike = ~60-70° hip hinge.
+ * Smoothness from hip-Y velocity coefficient of variation (same as deadlift).
+ * Form from per-frame adherence counts.
+ *
+ * MQS = smoothness × 0.35 + form × 0.40 + completion × 0.25
+ */
+
+export { getSmoothnessScore, computeMQS, calculateDCI } from '@/modules/squat/scoring';
+
+/** Completion sub-score per rep, by peak hip hinge angle during hike-back. */
+export function getCompletionScore(peakHingeDeg: number): number {
+  if (peakHingeDeg >= 65) return 100;
+  if (peakHingeDeg >= 55) return 75;
+  if (peakHingeDeg >= 45) return 50;
+  if (peakHingeDeg >= 30) return 25;
+  return 0;
+}
+
+/** Form sub-score from per-frame adherence counts. */
+export function getFormScore(form: {
+  backStraightCount: number;
+  hipLevelCount: number;
+  totalCount: number;
+}): number {
+  if (form.totalCount === 0) return 50;
+  const backPct = form.backStraightCount / form.totalCount;
+  const hipPct = form.hipLevelCount / form.totalCount;
+  return Math.round((backPct + hipPct) * 50);
+}

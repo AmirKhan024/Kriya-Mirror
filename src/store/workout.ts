@@ -125,7 +125,73 @@ export type WarningType =
   // Romanian Deadlift: spine rounding / knees over-bending into a squat / short ROM
   | 'rdl-back-rounded'
   | 'excessive-knee-bend'
-  | 'incomplete-rdl';
+  | 'incomplete-rdl'
+  // Kettlebell Swing: squatting instead of hinging / arm-dominant swing / short hip extension
+  | 'squat-pattern'
+  | 'arm-lift'
+  | 'incomplete-extension'
+  // Burpee: missing the jump / not getting into full plank
+  | 'no-jump'
+  | 'incomplete-plank'
+  // Box Jump: stiff landing / no hip-load / short jump
+  | 'stiff-landing'
+  | 'no-loading'
+  | 'incomplete-jump'
+  // Mountain Climber: knee not driving to chest
+  | 'incomplete-drive'
+  // Lateral Raise: arms going above parallel
+  | 'above-parallel'
+  // Star Jump: arms not reaching overhead
+  | 'incomplete-star-jump'
+  // Glute Bridge: hips not reaching full extension
+  | 'incomplete-bridge'
+  // Overhead Tricep Extension: short ROM
+  | 'incomplete-tricep-extension'
+  // Chair Dip: elbows not bending to 90°
+  | 'incomplete-dip'
+  // Dead Bug: lower back lifting off / short limb extension
+  | 'hip-lift-off'
+  | 'incomplete-dead-bug'
+  // Inchworm: short hinge / not reaching floor
+  | 'incomplete-inchworm'
+  // Jump Squat: short jump ROM
+  | 'incomplete-jump-squat'
+  // Shrug: incomplete shoulder elevation
+  | 'incomplete-shrug'
+  // Superman: chest/legs not lifting high enough
+  | 'incomplete-superman'
+  // Bird-Dog: limbs not extending fully
+  | 'incomplete-bird-dog'
+  // Step-Up: not driving all the way up onto the step
+  | 'incomplete-step-up'
+  // Walking Lunge: front thigh not reaching parallel
+  | 'incomplete-walking-lunge'
+  // Reverse Fly: arms not reaching shoulder height
+  | 'incomplete-reverse-fly'
+  // Goblet Squat: elbows collapsing / not reaching depth
+  | 'goblet-elbows-collapsing'
+  | 'incomplete-goblet-squat'
+  // Donkey Kick: heel not driving high enough
+  | 'incomplete-donkey-kick'
+  // Fire Hydrant: knee not abducting high enough
+  | 'incomplete-fire-hydrant'
+  // Curtsy Lunge: short ROM / hip swinging / torso leaning / knee valgus
+  | 'incomplete-curtsy-lunge'
+  | 'hip-rotation-curtsy'
+  | 'trunk-lean'
+  | 'knee-valgus'
+  // Pallof Press: arms not extending fully / torso rotating
+  | 'incomplete-pallof-press'
+  | 'torso-rotation-pallof'
+  // Lateral Band Walk: steps not tracking / hip drop
+  | 'steps-not-tracked'
+  | 'hip-drop'
+  // Pistol Squat: not reaching depth
+  | 'incomplete-pistol-squat'
+  // Nordic Curl: not lowering far enough
+  | 'incomplete-nordic-curl'
+  // Clamshell: knee not opening high enough
+  | 'incomplete-clamshell';
 
 export interface RepRecord {
   index: number;
