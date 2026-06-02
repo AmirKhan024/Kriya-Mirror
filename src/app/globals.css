@@ -2,26 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design Tokens — mirrors kriya-v3-main/src/app/globals.css ───
+   Hex values identical to mobility_new/launcher-styles.css AND kriya-v3-main.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-background: #0A0E17;
+  --color-foreground: #f8fafc;
+  --color-primary: #0d9488;
+  --color-primary-light: #2dd4bf;
+  --color-surface: #131A2B;
+  --color-surface-2: #1a2435;
+  --color-surface-3: #243049;
+  --color-muted: #5a6b80;
+  --color-muted-foreground: #8fa3b8;
+
+  /* Game-layer primary CTA */
+  --color-accent-teal: #00E5CC;
+  --color-accent-teal-hover: #00CFB8;
+  --color-accent-teal-soft: rgba(0, 229, 204, 0.12);
+  --color-accent-teal-border: rgba(0, 229, 204, 0.28);
+  --color-accent-teal-glow: rgba(0, 229, 204, 0.25);
+  --color-accent-amber: #FFB547;
+  --color-accent-amber-soft: rgba(255, 181, 71, 0.12);
+  --color-accent-amber-border: rgba(255, 181, 71, 0.35);
+  --color-accent-danger: #FF4D6A;
+  --color-accent-danger-soft: rgba(255, 77, 106, 0.08);
+  --color-accent-danger-border: rgba(255, 77, 106, 0.35);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { color-scheme: dark; }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .text-balance { text-wrap: balance; }
+
+  /* ─── Rule C utilities: overlay surfaces readable at 2 m ─── */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-3);
+    border-radius: 12px;
+  }
+
+  /* Solid backdrop for any overlay text drawn over the camera feed.
+     /90 opacity + border + drop shadow keeps text legible against any background. */
+  .bg-overlay {
+    background-color: rgba(8, 11, 19, 0.92);
+    border: 1px solid rgba(36, 48, 73, 0.85);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+  }
+
+  .bg-overlay-danger {
+    background-color: rgba(80, 12, 24, 0.92);
+    border: 1px solid var(--color-accent-danger-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+  }
+
+  .bg-overlay-amber {
+    background-color: rgba(70, 38, 4, 0.92);
+    border: 1px solid var(--color-accent-amber-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
   }
 }
